@@ -26,7 +26,8 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Routing/routing.hpp \
     src/Routing/metric.hpp \
     src/Routing/dijkstra.hpp \
-    src/Routing/astar.hpp
+    src/Routing/astar.hpp \
+    src/Database/spacefillingcurves.hpp
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -44,4 +45,5 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Routing/routing.cpp \
     src/Routing/metric.cpp \
     src/Routing/dijkstra.cpp \
-    src/Routing/astar.cpp
+    src/Routing/astar.cpp \
+    src/Database/spacefillingcurves.cpp

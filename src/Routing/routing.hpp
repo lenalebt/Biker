@@ -44,6 +44,7 @@ public:
 	virtual bool contains(ID_Datatype nodeID)=0;
 	virtual bool isEmpty()=0;
 	virtual int size()=0;
+    virtual ~Heap() {}
 };
 
 /**
@@ -145,6 +146,15 @@ public:
 	bool isEmpty() {return heap.isEmpty();}
 	bool contains(ID_Datatype nodeID) {return positionInHeap.contains(nodeID);}
 	int size() {return positionInHeap.size();}
+    
+    ~BinaryHeap()
+    {
+        /*for (QListIterator<boost::shared_ptr<T> > it(heap); it.hasNext(); )
+        {
+            it.next().reset();
+        }*/
+        heap.clear();
+    }
 };
 
 class ClosedList
@@ -193,7 +203,7 @@ public:
 	virtual GPSRoute calcShortestRoute(GPSPosition startPosition, OSMNode endNode)=0;
     virtual GPSRoute calcShortestRoute(OSMNode startNode, OSMNode endNode)=0;
 	
-	virtual OSMNode calcStartEndNode(GPSPosition pos, double radius=-100.0);
+	virtual OSMNode calcStartEndNode(GPSPosition pos, double radius=50.0);
 	Router(OSMDatabaseReader* db, RouterMetric* metric);
 	virtual ~Router();
 };

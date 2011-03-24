@@ -114,10 +114,8 @@ GPSRoute AStar::calcShortestRoute(AStarRoutingNode startNode, OSMNode endNode)
 		{
 			r.addWaypointInFront(*actRoutePoint);
 			actRoutePoint = nodeMap[actRoutePoint->getPredecessor()];	//Vorgänger raussuchen
-			//Toolbox::log("   Routenpunkt: %1.0f", (double)actRoutePoint->getID(), Toolbox::FINEST);
 		}
 		r.addWaypointInFront(*actRoutePoint);	//Startpunkt auch hinzufügen.
-		//Toolbox::log("   Routenpunkt: %1.0f", (double)actRoutePoint->getID(), Toolbox::FINEST);
         nodeMap.clear();
 		return r;
 	}

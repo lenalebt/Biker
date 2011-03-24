@@ -3,7 +3,7 @@
 #include <QList>
 #include "src/DataPrimitives/osmproperty.hpp"
 
-OSMPropertyTree* OSMPropertyTree::convertToOrPropertyTree(QList<OSMProperty> propList)
+boost::shared_ptr<OSMPropertyTree> OSMPropertyTree::convertToOrPropertyTree(QList<OSMProperty> propList)
 {
     if (propList.size() > 1)
     {
@@ -12,10 +12,10 @@ OSMPropertyTree* OSMPropertyTree::convertToOrPropertyTree(QList<OSMProperty> pro
         OSMProperty prop2 = propList.last();
         propList.removeLast();
 
-        OSMPropertyTreeBinaryOrNode* node = new OSMPropertyTreeBinaryOrNode(new OSMPropertyTreePropertyNode(prop1), new OSMPropertyTreePropertyNode(prop2));
+        boost::shared_ptr<OSMPropertyTree> node(new OSMPropertyTreeBinaryOrNode(new OSMPropertyTreePropertyNode(prop1), new OSMPropertyTreePropertyNode(prop2)));
         while (propList.size() >= 1)
         {
-            OSMPropertyTreeBinaryOrNode* newNode = new OSMPropertyTreeBinaryOrNode(new OSMPropertyTreePropertyNode(propList.last()), node);
+            boost::shared_ptr<OSMPropertyTreeBinaryOrNode> newNode(new OSMPropertyTreeBinaryOrNode(boost::shared_ptr<OSMPropertyTree>(new OSMPropertyTreePropertyNode(propList.last())), node));
             propList.removeLast();
             node=newNode;
         }
@@ -23,8 +23,8 @@ OSMPropertyTree* OSMPropertyTree::convertToOrPropertyTree(QList<OSMProperty> pro
     }
     else if (propList.size() == 1)
     {
-        return new OSMPropertyTreePropertyNode(propList[0]);
+        return boost::shared_ptr<OSMPropertyTree>(new OSMPropertyTreePropertyNode(propList[0]));
     }
     else
-        return 0;
+        return boost::shared_ptr<OSMPropertyTree>();
 }

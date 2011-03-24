@@ -27,12 +27,19 @@ float OSMDatabaseReader::getAltitude(float lon, float lat)
 OSMInMemoryDatabase::OSMInMemoryDatabase()
         : dbOpen(false)
 {
+    curve = new ZOrderCurve();
+}
+
+OSMInMemoryDatabase::OSMInMemoryDatabase(SpaceFillingCurve* curve)
+        : dbOpen(false), curve(curve)
+{
     
 }
 
 OSMInMemoryDatabase::~OSMInMemoryDatabase()
 {
     closeDatabase();
+    delete curve;
 }
 
 QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& /*props*/)
@@ -43,8 +50,15 @@ QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPositi
 	lBoundY = searchMidPoint.calcPositionInDistance(180.0, radius).getLat();
 	uBoundY = searchMidPoint.calcPositionInDistance(0.0, radius).getLat();
     
-    //TODO: RStarVisitor bauen, der alle Knoten aufschreibt
-    return QList<boost::shared_ptr<OSMNode> >();
+    QList<boost::shared_ptr<OSMNode> > nodeList;
+    int lBound = curve->getBucketID(lBoundX, lBoundY);
+    int uBound = curve->getBucketID(uBoundX, uBoundY);
+    for (int i=lBound; i<=uBound; i++)
+    {
+        nodeList << nodePlaceMap.values(i);
+    }
+    
+    return nodeList;
 }
 //QList<Node*> OSMInMemoryDatabase::getNodes(const Polygon& searchPolygon, OSMPropertyTree& props){}
 QList<boost::shared_ptr<OSMEdge> > OSMInMemoryDatabase::getEdges(const OSMNode& startNode)
@@ -54,7 +68,6 @@ QList<boost::shared_ptr<OSMEdge> > OSMInMemoryDatabase::getEdges(const OSMNode& 
 QList<boost::shared_ptr<OSMEdge> > OSMInMemoryDatabase::getEdges(const OSMNode& startNode, OSMPropertyTree& props)
 {
     QList<boost::shared_ptr<OSMEdge> > edgeList = edgeMap.values(startNode.getID());   //TODO: Raussieben!
-    qDebug() << props.toString();
     QList<boost::shared_ptr<OSMEdge> > filteredEdgeList;
     
     for (QList<boost::shared_ptr<OSMEdge> >::iterator edgeIt = edgeList.begin(); edgeIt < edgeList.end(); edgeIt++)
@@ -101,7 +114,9 @@ void OSMInMemoryDatabase::addEdge(OSMEdge* edge)
 void OSMInMemoryDatabase::addNode(OSMNode* node)
 {
     //nodeTree.Insert(node, bounds<float>(node->getLon(), node->getLat(), node->getLon(), node->getLat()));
-    nodeMap.insert(node->getID(), boost::shared_ptr<OSMNode>(node));
+    boost::shared_ptr<OSMNode> nodePtr(node);
+    nodeMap.insert(node->getID(), nodePtr);
+    nodePlaceMap.insert(curve->getBucketID(node->getLon(), node->getLat()), nodePtr);
 }
 void OSMInMemoryDatabase::addEdgeWithID(OSMEdgeWithID* edgeWithID)
 {

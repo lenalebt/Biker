@@ -19,10 +19,10 @@ double EuclidianMetric::calcCost(const OSMNode& startNode, const OSMNode& endNod
 			return std::numeric_limits<double>::max();
 	}
 }
-OSMPropertyTree* EuclidianMetric::getAssociatedPropertyTree()
+boost::shared_ptr<OSMPropertyTree> EuclidianMetric::getAssociatedPropertyTree()
 {
-	static OSMPropertyTree* propTree;
-	if (propTree == 0)
+	static boost::shared_ptr<OSMPropertyTree> propTree;
+	if (propTree.get() == 0)
 	{
 		QList<OSMProperty> propList;
 		propList << OSMProperty("highway","primary");
@@ -112,10 +112,10 @@ double CarMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, con
 			return std::numeric_limits<double>::max();
 	}
 }
-OSMPropertyTree* CarMetric::getAssociatedPropertyTree()
+boost::shared_ptr<OSMPropertyTree> CarMetric::getAssociatedPropertyTree()
 {
-	static OSMPropertyTree* propTree;
-	if (propTree == 0)
+	static boost::shared_ptr<OSMPropertyTree> propTree;
+	if (propTree.get() == 0)
 	{
 		QList<OSMProperty> propList;
 		propList << OSMProperty("highway","motorway");
@@ -214,7 +214,7 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
         if (db != 0)
         {
             penalty += fabs((db->getAltitude(startNode.getLon(), startNode.getLat()) - db->getAltitude(endNode.getLon(), endNode.getLat())))
-                        * 150.0; //jeder Höhenmeter wird bestraft mit 150m Umweg.
+                        * altitudePenalty; //jeder Höhenmeter wird bestraft mit x m Umweg.
         }
         
 		return distance + penalty;
@@ -227,10 +227,10 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 			return std::numeric_limits<double>::max();
 	}
 }
-OSMPropertyTree* BikeMetric::getAssociatedPropertyTree()
+boost::shared_ptr<OSMPropertyTree> BikeMetric::getAssociatedPropertyTree()
 {
-	static OSMPropertyTree* propTree;
-	if (propTree == 0)
+	static boost::shared_ptr<OSMPropertyTree> propTree;
+	if (propTree.get() == 0)
 	{
 		QList<OSMProperty> propListA;
 		propListA << OSMProperty("highway","primary");
@@ -250,14 +250,14 @@ OSMPropertyTree* BikeMetric::getAssociatedPropertyTree()
         propListA << OSMProperty("cycleway","lane");
         propListA << OSMProperty("bicycle","yes");
 		propListA << OSMProperty("highway","steps");		//nur erlaubt unter hohen Kosten.
-		OSMPropertyTree* propTreeA = OSMPropertyTree::convertToOrPropertyTree(propListA);
+		boost::shared_ptr<OSMPropertyTree> propTreeA(OSMPropertyTree::convertToOrPropertyTree(propListA));
 		
 		//Fußgängerwege nur, wenn Räder zugelassen sind
         OSMProperty highway_footway("highway","footway");
         OSMProperty bicycle_yes("bicycle","yes");
-		OSMPropertyTree* propTreeB = new OSMPropertyTreeBinaryAndNode(new OSMPropertyTreePropertyNode(highway_footway), new OSMPropertyTreePropertyNode(bicycle_yes));
+		boost::shared_ptr<OSMPropertyTree> propTreeB(new OSMPropertyTreeBinaryAndNode(new OSMPropertyTreePropertyNode(highway_footway), new OSMPropertyTreePropertyNode(bicycle_yes)));
 		
-		propTree = new OSMPropertyTreeBinaryOrNode(propTreeA, propTreeB);
+		propTree = boost::shared_ptr<OSMPropertyTree>(new OSMPropertyTreeBinaryOrNode(propTreeA, propTreeB));
 	}
 	return propTree;
 	//return new PropertyTreeNodeAlwaysTrue();
@@ -277,10 +277,10 @@ double FastRoutingMetric::calcCost(const OSMNode& startNode, const OSMNode& endN
 			return std::numeric_limits<double>::max();
 	}
 }
-OSMPropertyTree* FastRoutingMetric::getAssociatedPropertyTree()
+boost::shared_ptr<OSMPropertyTree> FastRoutingMetric::getAssociatedPropertyTree()
 {
-	static OSMPropertyTree* propTree;
-	if (propTree == 0)
+	static boost::shared_ptr<OSMPropertyTree> propTree;
+	if (propTree.get() == 0)
 	{
 		QList<OSMProperty> propList;
 		//propList << OSMProperty("highway","motorway");

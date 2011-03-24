@@ -11,6 +11,8 @@
 #include "src/Database/srtm/srtm.h"
 #include "src/Database/osmdatabasewriter.hpp"
 #include <boost/shared_ptr.hpp>
+#include <inttypes.h>
+#include "src/Database/spacefillingcurves.hpp"
 
 
 class OSMDatabaseReader
@@ -62,6 +64,7 @@ class OSMInMemoryDatabase : public OSMDatabaseReader, public OSMDatabaseWriter
 {
 public:   
 	OSMInMemoryDatabase();
+    OSMInMemoryDatabase(SpaceFillingCurve* curve);
 	~OSMInMemoryDatabase();
     
     //stammt vom DatabaseReader
@@ -87,9 +90,11 @@ public:
 private:
 	std::string dbFilename;
     bool dbOpen;
+    SpaceFillingCurve* curve;
     
     QMultiMap<ID_Datatype, boost::shared_ptr<OSMEdge> > edgeMap;
     QMap<ID_Datatype, boost::shared_ptr<OSMNode> > nodeMap;
+    QMultiMap<uint32_t, boost::shared_ptr<OSMNode> > nodePlaceMap;
 };
 
 
