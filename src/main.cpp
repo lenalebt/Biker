@@ -12,7 +12,7 @@ using namespace std;
         cout << "OSM-Routing-Testprogramm" << endl;
         OSMInMemoryDatabase test;
         cout << "Parsen..." << endl;
-        test.openDatabase("data/hagen.osm");
+        test.openDatabase("data/hagen-teil.osm");
         cout << "Parsen fertig!" << endl;
         
         cout << "Warte 5 Sekunden..." << endl;
