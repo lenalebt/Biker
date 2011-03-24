@@ -47,6 +47,8 @@ void OSMDatabaseWriter::addWay(OSMWay* way)
         }
         oldID = *it;
     }
+    
+    delete way;
 }
 
 void OSMDatabaseWriter::addEdge(OSMEdge* edge)

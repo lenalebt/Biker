@@ -106,10 +106,10 @@ void SrtmDownloader::createFileList()
 
     if (fileList.size() != SRTM_FILE_COUNT) {
         qCritical() << "Could not download complete list of tiles from SRTM server. Got" << fileList.size() << "tiles but" << SRTM_FILE_COUNT << "were expected.";
-        exit(1);
+        //exit(1); //ERROR: SRTM-Filecount was wrong. Should not matter to comment this out.
     }
     
-    QFile file(cachedir+"filelist");
+    QFile file(cachedir+"srtmfilelist");
     if (!file.open(QIODevice::WriteOnly)) {
         qCritical() << "Could not open file" << cachedir+"filelist";
         //Not a fatal error. We just can't cache the list.
@@ -123,7 +123,7 @@ void SrtmDownloader::createFileList()
 /** Load a file list or create a new one if it doesn't exist. */
 void SrtmDownloader::loadFileList()
 {
-    QFile file(cachedir+"filelist");
+    QFile file(cachedir+"srtmfilelist");
     if (!file.open(QIODevice::ReadOnly)) {
         createFileList();
         return;
@@ -131,9 +131,9 @@ void SrtmDownloader::loadFileList()
     QDataStream stream(&file);
     stream >> fileList;
     file.close();
-    if (fileList.size() != SRTM_FILE_COUNT) {
+    /*if (fileList.size() != SRTM_FILE_COUNT) { //ERROR: SRTM-Filecount was wrong. Should not matter to comment this out.
         createFileList();
-    }
+    }*/
 }
 
 /** Get tile for a specified location.

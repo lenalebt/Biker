@@ -13,7 +13,7 @@ public:
     virtual void addEdgeWithID(OSMEdgeWithID* edgeWithID);
     virtual void addWay(OSMWay* way);
     virtual void addRelation(OSMRelation* relation);
-    virtual void finishedParsing()=0;
+    virtual void finished()=0;
 };
 
 #endif // OSMDATABASEWRITER_HPP

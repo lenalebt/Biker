@@ -11,21 +11,21 @@ template <bool parseNodes, bool parseWays, bool parseRelations>
 class OSMParser : public QXmlDefaultHandler
 {
 private:
-    OSMDatabaseWriter* dbWriter;
+    OSMDatabaseWriter& dbWriter;
 
     NodeType nodeType;
 
     OSMNode* node;
     OSMWay* way;
     OSMEdge* edge;
+    OSMRelation* relation;
 
     int nodeCount;
-    int edgeCount;
     int wayCount;
     int relationCount;
 
 public:
-    OSMParser( OSMDatabaseWriter* dbWriter);
+    OSMParser( OSMDatabaseWriter& dbWriter);
     ~OSMParser();
     bool startDocument();
     bool endElement ( const QString & namespaceURI, const QString & localName, const QString & qName );
@@ -35,5 +35,6 @@ public:
 
     bool parse(QString filename);
 };
+
 
 #endif // OSMPARSER_HPP

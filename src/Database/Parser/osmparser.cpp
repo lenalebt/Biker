@@ -2,8 +2,8 @@
 #include <iostream>
 
 template <bool parseNodes, bool parseWays, bool parseRelations>
-OSMParser<parseNodes, parseWays, parseRelations>::OSMParser(OSMDatabaseWriter* dbWriter)
-    : dbWriter(dbWriter), nodeType(NONE), nodeCount(0), edgeCount(0), wayCount(0), relationCount(0)
+OSMParser<parseNodes, parseWays, parseRelations>::OSMParser(OSMDatabaseWriter& dbWriter)
+    : dbWriter(dbWriter), nodeType(NONE), nodeCount(0), wayCount(0), relationCount(0)
 {
 
 }
@@ -145,7 +145,7 @@ bool OSMParser<parseNodes, parseWays, parseRelations>::endElement ( const QStrin
         if (qName == "node")
         {
             nodeType = NONE;
-            dbWriter->addNode(node);
+            dbWriter.addNode(node);
         }
     }
     else if (parseWays && nodeType == WAY)
@@ -153,16 +153,17 @@ bool OSMParser<parseNodes, parseWays, parseRelations>::endElement ( const QStrin
         if (qName == "way")
         {
             nodeType = NONE;
-
-
-            delete way;
+            dbWriter.addWay(way);
         }
     }
-    else if (nodeType == RELATION)
+    else if (parseRelations && nodeType == RELATION)
     {
         if (qName == "relation")
         {
             nodeType = NONE;
+            dbWriter.addRelation(relation);
+
+            delete relation;
         }
     }
 
@@ -172,8 +173,14 @@ bool OSMParser<parseNodes, parseWays, parseRelations>::endElement ( const QStrin
 template <bool parseNodes, bool parseWays, bool parseRelations>
 bool OSMParser<parseNodes, parseWays, parseRelations>::endDocument ()
 {
-    dbWriter->finishedParsing();
+    dbWriter.finished();
     std::cerr << "EndDocument. NodeCount: " << nodeCount << " WayCount: " << wayCount
-        << " EdgeCount: " << edgeCount << " RelationCount: " << relationCount << std::endl;
+        << " RelationCount: " << relationCount << std::endl;
     return true;
 }
+
+template class OSMParser<false, false, false>;
+template class OSMParser<true, false, false>;
+template class OSMParser<false, true, false>;
+template class OSMParser<true, true, false>;
+template class OSMParser<true, true, true>;

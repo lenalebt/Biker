@@ -38,7 +38,7 @@ bool OSMProperty::operator==(const OSMProperty& prop) const
 }
 bool OSMProperty::containsWildcards() const
 {
-        return this->value.get().contains("?") || this->value.get().contains("*");
+    return this->value.get().contains("?") || this->value.get().contains("*");
 }
 
 std::size_t hash_value(QString const& b)

@@ -3,6 +3,13 @@ INCLUDEPATH += /usr/include/
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip
+
+profiling {
+    QMAKE_CFLAGS+=-pg
+    QMAKE_CXXFLAGS+=-pg
+    QMAKE_LFLAGS+=-pg
+}
+
 HEADERS += src/Database/osmdatabase.hpp \
     src/DataPrimitives/osmproperty.hpp \
     src/DataPrimitives/DataPrimitives.hpp \

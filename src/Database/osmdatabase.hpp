@@ -1,6 +1,7 @@
 #ifndef OSMDATABASE_HPP
 #define OSMDATABASE_HPP
 
+#include <iostream>
 #include <QList>
 #include "src/DataPrimitives/DataPrimitives.hpp"
 #include "src/DataPrimitives/osmnode.hpp"
@@ -8,6 +9,7 @@
 #include "src/DataPrimitives/osmway.hpp"
 #include "src/DataPrimitives/osmpropertytree.hpp"
 #include "src/Database/srtm/srtm.h"
+#include "src/Database/osmdatabasewriter.hpp"
 
 
 class OSMDatabaseReader
@@ -42,7 +44,7 @@ public:
 
     virtual QList<OSMWay*> getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)=0;
 
-    virtual void openDatabase(std::string filename)=0;
+    virtual void openDatabase(QString filename)=0;
     virtual bool isOpen()=0;
     virtual void closeDatabase()=0;
 
@@ -53,5 +55,41 @@ public:
     virtual ~OSMDatabaseReader();
 protected:
 };
+
+
+class OSMInMemoryDatabase : public OSMDatabaseReader, public OSMDatabaseWriter
+{
+public:   
+	OSMInMemoryDatabase();
+	~OSMInMemoryDatabase();
+    
+    //stammt vom DatabaseReader
+	QList<OSMNode*> getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props);
+	//QList<OSMNode*> getNodes(const Polygon& searchPolygon, OSMPropertyTree* props);
+	QList<OSMEdge*> getEdges(const OSMNode& startNode);
+	QList<OSMEdge*> getEdges(const OSMNode& startNode, OSMPropertyTree& props);
+	QList<OSMWay*> getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props);
+	OSMNode* getNode(ID_Datatype id);
+	
+	void openDatabase(QString filename);
+	bool isOpen();
+	void closeDatabase();
+    
+    //stammt vom DatabaseWriter
+    void finished();
+    void addNode(OSMNode* node);
+    void addEdge(OSMEdge* edge);
+    void addEdgeWithID(OSMEdgeWithID* edgeWithID);
+    void addWay(OSMWay* way);
+    void addRelation(OSMRelation* relation);
+    
+private:
+	std::string dbFilename;
+    bool dbOpen;
+    
+    QMultiMap<ID_Datatype, OSMEdge*> edgeMap;
+    QMap<ID_Datatype, OSMNode*> nodeMap;
+};
+
 
 #endif // OSMDATABASE_HPP
