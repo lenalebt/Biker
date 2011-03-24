@@ -18,7 +18,7 @@ public:
     void setID(ID_Datatype id) {this->id = id;}
     QList<ID_Datatype> getMemberList() const {return memberIDList;}
     void addMember(ID_Datatype nodeID) {memberIDList << nodeID;}
-    void addProperty(OSMProperty& prop) {properties << prop;}
+    void addProperty(OSMProperty prop) {properties << prop;}
     QList<OSMProperty> getProperties() const {return properties;}
 };
 

@@ -9,6 +9,7 @@
 #include "src/DataPrimitives/osmnode.hpp"
 #include "src/DataPrimitives/osmedge.hpp"
 #include "src/DataPrimitives/osmway.hpp"
+#include "src/DataPrimitives/osmrelation.hpp"
 
 
 #endif // DATAPRIMITIVES_HPP

@@ -7,11 +7,13 @@
 #include "src/DataPrimitives/osmedge.hpp"
 #include "src/DataPrimitives/osmway.hpp"
 #include "src/DataPrimitives/osmpropertytree.hpp"
+#include "src/Database/srtm/srtm.h"
 
 
-class OSMDatabase
+class OSMDatabaseReader
 {
 public:
+    SrtmDownloader* downloader;
     /**
      * Sucht aus dem Datenbestand alle Nodes heraus, die sich in einem gewissen
      * Abstand um einen Mittelpunkt befinden, und die gewisse Eigenschaften haben.
@@ -43,6 +45,12 @@ public:
     virtual void openDatabase(std::string filename)=0;
     virtual bool isOpen()=0;
     virtual void closeDatabase()=0;
+
+    virtual float getAltitude(float lon, float lat);
+
+    OSMDatabaseReader();
+    OSMDatabaseReader(QString srtmUrl, QString cachedir);
+    virtual ~OSMDatabaseReader();
 protected:
 };
 
