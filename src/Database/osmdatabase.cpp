@@ -4,7 +4,7 @@
 OSMDatabaseReader::OSMDatabaseReader()
 {
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    downloader = new SrtmDownloader("http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/", "./data/");
+    downloader = new SrtmDownloader("http://dds.cr.usgs.gov/srtm/version2_1/SRTM3/", "./data");
 }
 OSMDatabaseReader::OSMDatabaseReader(QString srtmUrl, QString cachedir)
 {   //TODO: Sicherheitsproblem: an dieser Stelle ist es evtl. möglich, ins Dateisystem einzudringen.
@@ -35,7 +35,7 @@ OSMInMemoryDatabase::~OSMInMemoryDatabase()
     closeDatabase();
 }
 
-QList<OSMNode*> OSMInMemoryDatabase::getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& /*props*/)
+QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& /*props*/)
 {
     double lBoundX, uBoundX, lBoundY, uBoundY;
 	lBoundX = searchMidPoint.calcPositionInDistance(270.0, radius).getLon();
@@ -44,19 +44,20 @@ QList<OSMNode*> OSMInMemoryDatabase::getNodes(const GPSPosition& searchMidPoint,
 	uBoundY = searchMidPoint.calcPositionInDistance(0.0, radius).getLat();
     
     //TODO: RStarVisitor bauen, der alle Knoten aufschreibt
-    return QList<OSMNode*>();
+    return QList<boost::shared_ptr<OSMNode> >();
 }
 //QList<Node*> OSMInMemoryDatabase::getNodes(const Polygon& searchPolygon, OSMPropertyTree& props){}
-QList<OSMEdge*> OSMInMemoryDatabase::getEdges(const OSMNode& startNode)
+QList<boost::shared_ptr<OSMEdge> > OSMInMemoryDatabase::getEdges(const OSMNode& startNode)
 {
     return edgeMap.values(startNode.getID());
 }
-QList<OSMEdge*> OSMInMemoryDatabase::getEdges(const OSMNode& startNode, OSMPropertyTree& props)
+QList<boost::shared_ptr<OSMEdge> > OSMInMemoryDatabase::getEdges(const OSMNode& startNode, OSMPropertyTree& props)
 {
-    QList<OSMEdge*> edgeList = edgeMap.values(startNode.getID());   //TODO: Raussieben!
-    QList<OSMEdge*> filteredEdgeList;
+    QList<boost::shared_ptr<OSMEdge> > edgeList = edgeMap.values(startNode.getID());   //TODO: Raussieben!
+    qDebug() << props.toString();
+    QList<boost::shared_ptr<OSMEdge> > filteredEdgeList;
     
-    for (QList<OSMEdge*>::iterator edgeIt = edgeList.begin(); edgeIt < edgeList.end(); edgeIt++)
+    for (QList<boost::shared_ptr<OSMEdge> >::iterator edgeIt = edgeList.begin(); edgeIt < edgeList.end(); edgeIt++)
     {
         QList<OSMProperty> propList = (*edgeIt)->getProperties();
         props.resetPropertiesFound();
@@ -71,46 +72,36 @@ QList<OSMEdge*> OSMInMemoryDatabase::getEdges(const OSMNode& startNode, OSMPrope
     
     return filteredEdgeList;
 }
-QList<OSMWay*> OSMInMemoryDatabase::getWays(const GPSPosition& /*searchMidPoint*/, double /*radius*/, OSMPropertyTree& /*props*/){return QList<OSMWay*>();}//TODO
-OSMNode* OSMInMemoryDatabase::getNode(ID_Datatype id)
+QList<boost::shared_ptr<OSMWay> > OSMInMemoryDatabase::getWays(const GPSPosition& /*searchMidPoint*/, double /*radius*/, OSMPropertyTree& /*props*/){return QList<boost::shared_ptr<OSMWay> >();}//TODO
+boost::shared_ptr<OSMNode>  OSMInMemoryDatabase::getNode(ID_Datatype id)
 {
     return nodeMap.value(id);
 }
 
-void OSMInMemoryDatabase::openDatabase(QString filename)
+bool OSMInMemoryDatabase::openDatabase(QString filename)
 {
     OSMParser<true, true, false> parser(*this);
-    parser.parse(filename);
-}//TODO
+    return (dbOpen=parser.parse(filename));
+}
 bool OSMInMemoryDatabase::isOpen() {return dbOpen;}
 void OSMInMemoryDatabase::closeDatabase()
 {
     //Speicher der Nodes freigeben...
-    for (QMapIterator<ID_Datatype, OSMNode*> it(nodeMap); it.hasNext(); )
-    {
-        it.next();
-        delete it.value();
-    }
     nodeMap.clear();
     
     //Speicher der Edges freigeben...
-    for (QMapIterator<ID_Datatype, OSMEdge*> it(edgeMap); it.hasNext(); )
-    {
-        it.next();
-        delete it.value();
-    }
     edgeMap.clear();
 }
 
 
 void OSMInMemoryDatabase::addEdge(OSMEdge* edge)
 {
-    edgeMap.insert(edge->getStartNodeID(), edge);
+    edgeMap.insert(edge->getStartNodeID(), boost::shared_ptr<OSMEdge>(edge));
 }
 void OSMInMemoryDatabase::addNode(OSMNode* node)
 {
     //nodeTree.Insert(node, bounds<float>(node->getLon(), node->getLat(), node->getLon(), node->getLat()));
-    nodeMap.insert(node->getID(), node);
+    nodeMap.insert(node->getID(), boost::shared_ptr<OSMNode>(node));
 }
 void OSMInMemoryDatabase::addEdgeWithID(OSMEdgeWithID* edgeWithID)
 {

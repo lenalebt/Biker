@@ -77,7 +77,7 @@ int SrtmZipFile::getData(QString filename, qint16 **buffer)
         }
 
         //store uncompressed content on disk?
-        if (true) {
+        if (false) {
             QFile file(uncompressedFile);
             if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
                 qCritical() << "ZIP(Writing): Could not open file" << uncompressedFile << file.errorString();

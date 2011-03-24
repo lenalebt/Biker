@@ -17,6 +17,7 @@ public:
     virtual bool containsWildcards() const=0;
     virtual void propertyFound(const OSMProperty& prop)=0;
     virtual void resetPropertiesFound()=0;
+    virtual QString toString()=0;
 
     virtual ~OSMPropertyTree() {}
     virtual OSMPropertyTree* clone()=0;
@@ -75,6 +76,7 @@ public:
     OSMPropertyTreeBinaryAndNode() : OSMPropertyTreeBinaryNode() {}
     bool evaluate() const {return lChild->evaluate() && rChild->evaluate();}
     OSMPropertyTreeBinaryAndNode* clone() {return new OSMPropertyTreeBinaryAndNode(lChild->clone(), rChild->clone());}
+    QString toString() {return "(" + lChild->toString() + " AND " + rChild->toString() + ")";}
 };
 
 /**
@@ -88,6 +90,7 @@ public:
     OSMPropertyTreeBinaryOrNode() : OSMPropertyTreeBinaryNode() {}
     bool evaluate() const {return lChild->evaluate() || rChild->evaluate();}
     OSMPropertyTreeBinaryOrNode* clone() {return new OSMPropertyTreeBinaryOrNode(lChild->clone(), rChild->clone());}
+    QString toString() {return "(" + lChild->toString() + " OR " + rChild->toString() + ")";}
 };
 
 
@@ -114,6 +117,8 @@ public:
 
     ~OSMPropertyTreePropertyNode() {}
     OSMPropertyTreePropertyNode* clone() {return new OSMPropertyTreePropertyNode(property);}
+    
+    QString toString() {return property.getKey() + "=" + property.getValue();}
 };
 
 

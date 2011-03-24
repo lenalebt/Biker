@@ -147,7 +147,8 @@ SrtmTile *SrtmDownloader::getTile(float lat, float lon)
     int index = latLonToIndex(intlat, intlon);
     SrtmTile *tile = tileCache[index];
 
-    if (tile) return tile;
+    if (tile)
+        return tile;
 
     if (fileList.contains(index)) {
         QStringList splitted = fileList[index].split("/", QString::SkipEmptyParts);

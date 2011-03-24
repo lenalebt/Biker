@@ -16,7 +16,7 @@ private:
 public:
     OSMNode() : GPSPosition(), id(0), properties(QList<OSMProperty>()) {}
     OSMNode(ID_Datatype id_, GPSPosition pos, QList<OSMProperty> props) : GPSPosition(pos), id(id_), properties(props) {}
-    ~OSMNode() {properties.clear();}
+    ~OSMNode() {}
     QList<OSMProperty> getProperties() const {return properties;}
     void addProperty(OSMProperty prop) {properties << prop;}
     ID_Datatype getID() const {return id;}

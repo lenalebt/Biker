@@ -1,8 +1,6 @@
 #ifndef DATAPRIMITIVES_HPP
 #define DATAPRIMITIVES_HPP
 
-
-
 #include "src/DataPrimitives/osmproperty.hpp"
 #include "src/DataPrimitives/gpsposition.hpp"
 #include "src/DataPrimitives/gpsroute.hpp"

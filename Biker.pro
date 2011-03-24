@@ -3,13 +3,11 @@ INCLUDEPATH += /usr/include/
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip
-
-profiling {
-    QMAKE_CFLAGS+=-pg
-    QMAKE_CXXFLAGS+=-pg
-    QMAKE_LFLAGS+=-pg
+profiling { 
+    QMAKE_CFLAGS += -pg
+    QMAKE_CXXFLAGS += -pg
+    QMAKE_LFLAGS += -pg
 }
-
 HEADERS += src/Database/osmdatabase.hpp \
     src/DataPrimitives/osmproperty.hpp \
     src/DataPrimitives/DataPrimitives.hpp \
@@ -24,7 +22,11 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Database/srtm/zip.h \
     src/Database/Parser/osmparser.hpp \
     src/Database/osmdatabasewriter.hpp \
-    src/DataPrimitives/osmrelation.hpp
+    src/DataPrimitives/osmrelation.hpp \
+    src/Routing/routing.hpp \
+    src/Routing/metric.hpp \
+    src/Routing/dijkstra.hpp \
+    src/Routing/astar.hpp
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -38,4 +40,8 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Database/srtm/zip.cpp \
     src/Database/Parser/osmparser.cpp \
     src/Database/osmdatabasewriter.cpp \
-    src/DataPrimitives/osmrelation.cpp
+    src/DataPrimitives/osmrelation.cpp \
+    src/Routing/routing.cpp \
+    src/Routing/metric.cpp \
+    src/Routing/dijkstra.cpp \
+    src/Routing/astar.cpp

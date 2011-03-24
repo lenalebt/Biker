@@ -10,6 +10,7 @@
 #include "src/DataPrimitives/osmpropertytree.hpp"
 #include "src/Database/srtm/srtm.h"
 #include "src/Database/osmdatabasewriter.hpp"
+#include <boost/shared_ptr.hpp>
 
 
 class OSMDatabaseReader
@@ -28,7 +29,7 @@ public:
      * 		drinstehen, aber evtl. steht auch nur eine einzelne Eigenschaft darin.
      * @return
      */
-    virtual QList<OSMNode*> getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)=0;
+    virtual QList<boost::shared_ptr<OSMNode> > getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)=0;
     /**
      * Sucht aus dem Datenbestand alle Nodes innerhalb eines gegebenen Polygons heraus,
      * die gewissen Eigenschaften genügen.
@@ -37,14 +38,14 @@ public:
      * @return
      */
     //virtual QList<OSMNode*> getNodes(const Polygon& searchPolygon, OSMPropertyTree& props)=0;
-    virtual OSMNode* getNode(ID_Datatype id)=0;
+    virtual boost::shared_ptr<OSMNode> getNode(ID_Datatype id)=0;
 
-    virtual QList<OSMEdge*> getEdges(const OSMNode& startNode)=0;
-    virtual QList<OSMEdge*> getEdges(const OSMNode& startNode, OSMPropertyTree& props)=0;
+    virtual QList<boost::shared_ptr<OSMEdge> > getEdges(const OSMNode& startNode)=0;
+    virtual QList<boost::shared_ptr<OSMEdge> > getEdges(const OSMNode& startNode, OSMPropertyTree& props)=0;
 
-    virtual QList<OSMWay*> getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)=0;
+    virtual QList<boost::shared_ptr<OSMWay> > getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)=0;
 
-    virtual void openDatabase(QString filename)=0;
+    virtual bool openDatabase(QString filename)=0;
     virtual bool isOpen()=0;
     virtual void closeDatabase()=0;
 
@@ -64,14 +65,14 @@ public:
 	~OSMInMemoryDatabase();
     
     //stammt vom DatabaseReader
-	QList<OSMNode*> getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props);
+	QList<boost::shared_ptr<OSMNode> > getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props);
 	//QList<OSMNode*> getNodes(const Polygon& searchPolygon, OSMPropertyTree* props);
-	QList<OSMEdge*> getEdges(const OSMNode& startNode);
-	QList<OSMEdge*> getEdges(const OSMNode& startNode, OSMPropertyTree& props);
-	QList<OSMWay*> getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props);
-	OSMNode* getNode(ID_Datatype id);
+	QList<boost::shared_ptr<OSMEdge> > getEdges(const OSMNode& startNode);
+	QList<boost::shared_ptr<OSMEdge> > getEdges(const OSMNode& startNode, OSMPropertyTree& props);
+	QList<boost::shared_ptr<OSMWay> > getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props);
+	boost::shared_ptr<OSMNode> getNode(ID_Datatype id);
 	
-	void openDatabase(QString filename);
+	bool openDatabase(QString filename);
 	bool isOpen();
 	void closeDatabase();
     
@@ -87,8 +88,8 @@ private:
 	std::string dbFilename;
     bool dbOpen;
     
-    QMultiMap<ID_Datatype, OSMEdge*> edgeMap;
-    QMap<ID_Datatype, OSMNode*> nodeMap;
+    QMultiMap<ID_Datatype, boost::shared_ptr<OSMEdge> > edgeMap;
+    QMap<ID_Datatype, boost::shared_ptr<OSMNode> > nodeMap;
 };
 
 
