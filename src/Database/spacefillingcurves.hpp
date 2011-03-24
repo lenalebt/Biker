@@ -46,7 +46,7 @@ public:
     SpaceFillingCurve(double minLon, double minLat, double maxLon, double maxLat) :
             minLon(minLon), minLat(minLat), maxLon(maxLon), maxLat(maxLat), meshSize(16) {}
     SpaceFillingCurve() :
-            minLon(0.0), minLat(0.0), maxLon(360.0), maxLat(360.0), meshSize(16) {}
+            minLon(0.0), minLat(0.0), maxLon(180.0), maxLat(360.0), meshSize(16) {}
     
 	/**
 	 * Diese Funktion gibt zu einer bestimmten Koordinate und der Angabe,

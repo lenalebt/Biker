@@ -51,8 +51,8 @@ bool OSMParser<parseNodes, parseWays, parseRelations>::startElement ( const QStr
             nodeCount++;
             nodeType = NODE;
 
-            ID_Datatype id;
-            double lon, lat;
+            ID_Datatype id=0;
+            double lon=0.0, lat=0.0;
 
             for (int i=0; i<atts.length(); i++)
             {
@@ -71,7 +71,7 @@ bool OSMParser<parseNodes, parseWays, parseRelations>::startElement ( const QStr
             wayCount++;
             nodeType = WAY;
 
-            ID_Datatype id;
+            ID_Datatype id=0.0;
 
             for (int i=0; i<atts.length(); i++)
             {

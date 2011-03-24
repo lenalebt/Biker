@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define TESTPROGRAM
+//#define TESTPROGRAM
 #ifdef TESTPROGRAM
     int main(int argc, char** argv)
     {

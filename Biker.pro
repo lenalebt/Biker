@@ -3,6 +3,9 @@ INCLUDEPATH += /usr/include/
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip
+OBJECTS_DIR = obj
+DESTDIR = bin
+
 profiling { 
     QMAKE_CFLAGS += -pg
     QMAKE_CXXFLAGS += -pg
