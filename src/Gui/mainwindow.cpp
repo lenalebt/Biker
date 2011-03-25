@@ -146,4 +146,5 @@ void MainWindow::showRoute(GPSRoute r)
     l->addGeometry(ls);
     
     mapcontrol->repaint();
+    mapcontrol->updateRequestNew();
 }
