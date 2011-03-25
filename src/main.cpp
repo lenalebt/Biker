@@ -6,38 +6,13 @@
 #include "src/Routing/astar.hpp"
 #include "src/Routing/dijkstra.hpp"
 #include <boost/shared_ptr.hpp>
+#include "src/Gui/mainwindow.hpp"
+#include <QtGui>
 
 using namespace std;
 
 //#define TESTPROGRAM
 #ifdef TESTPROGRAM
-    int main(int argc, char** argv)
-    {
-        QString filename("data/hagen.osm");
-        
-        if (argc > 1)
-        {
-            filename = QString(argv[1]);
-        }
-        
-        cout << "Datenbank öffnen..." << endl;
-        OSMInMemoryDatabase db;
-        if (!db.openDatabase(filename))
-        {
-            qCritical() << "Datenbank konnte nicht geöffnet werden!";
-            exit(1);
-        }
-        
-        GPSPosition posHome(7.4805, 51.3567);
-        GPSPosition posUni(7.267, 51.4469);
-        //AStar astar(&db, new BikeMetric(&db, 15.0f), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
-        AStar astar(&db, new CarMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
-        GPSRoute r = astar.calcShortestRoute(posHome, posUni);
-        
-        return 0;
-    }
-
-#else
     int main(int argc, char** argv)
     {
         QString filename("data/hagen.osm");
@@ -151,6 +126,20 @@ using namespace std;
         
         Route::exportGPX("test.gpx", r);
         */
+        
         return 0;
+    }
+
+#else
+    int main(int argc, char** argv)
+    {
+        //nötig, damit die flyweights nicht abstürzen
+        boost::flyweight<QString>::init();
+        
+        QApplication app(argc, argv);
+           
+        MainWindow mainWindow;
+        mainWindow.show();
+        return app.exec();
     }
 #endif

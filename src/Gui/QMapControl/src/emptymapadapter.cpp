@@ -26,7 +26,7 @@
 #include "emptymapadapter.h"
 namespace qmapcontrol
 {
-    EmptyMapAdapter::EmptyMapAdapter(int tileSize, int minZoom, int maxZoom)
+    EmptyMapAdapter::EmptyMapAdapter(int /*tileSize*/, int minZoom, int maxZoom)
 	:MapAdapter("", "", 256, minZoom, maxZoom)
     {
         PI = acos(-1.0);
@@ -65,7 +65,7 @@ namespace qmapcontrol
         return x * (180/PI);
     }
 
-    QString EmptyMapAdapter::query(int x, int y, int z) const
+    QString EmptyMapAdapter::query(int /*x*/, int /*y*/, int /*z*/) const
     {
 	return "";
     }

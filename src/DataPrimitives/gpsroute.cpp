@@ -90,7 +90,7 @@ void GPSRoute::addWaypointInFront(GPSPosition p)
 
 GPSPosition GPSRoute::getWaypoint(int i) const
 {
-    if ((i>0) && (i<waypointList.size()))
+    if ((i>=0) && (i<waypointList.size()))
         return waypointList.at(i);
     else
         return GPSPosition();

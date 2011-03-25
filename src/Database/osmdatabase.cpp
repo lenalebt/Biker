@@ -27,6 +27,7 @@ float OSMDatabaseReader::getAltitude(float lon, float lat)
 OSMInMemoryDatabase::OSMInMemoryDatabase()
         : dbOpen(false)
 {
+    closeDatabase();
     curve = new ZOrderCurve();
 }
 
@@ -38,7 +39,6 @@ OSMInMemoryDatabase::OSMInMemoryDatabase(SpaceFillingCurve* curve)
 
 OSMInMemoryDatabase::~OSMInMemoryDatabase()
 {
-    closeDatabase();
     delete curve;
 }
 
@@ -104,6 +104,8 @@ void OSMInMemoryDatabase::closeDatabase()
     
     //Speicher der Edges freigeben...
     edgeMap.clear();
+    
+    dbOpen = false;
 }
 
 

@@ -1,11 +1,15 @@
-QT += xml network
+QT += xml \
+    network
 INCLUDEPATH += /usr/include/
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip
 OBJECTS_DIR = obj
-DESTDIR = bin
+MOC_DIR = obj
+UI_DIR = obj
+RCC_DIR = obj
 
+DESTDIR = bin
 profiling { 
     QMAKE_CFLAGS += -pg
     QMAKE_CXXFLAGS += -pg
@@ -30,7 +34,33 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Routing/metric.hpp \
     src/Routing/dijkstra.hpp \
     src/Routing/astar.hpp \
-    src/Database/spacefillingcurves.hpp
+    src/Database/spacefillingcurves.hpp \
+    src/Gui/QMapControl/qmapcontrol.h \
+    src/Gui/QMapControl/src/yahoomapadapter.h \
+    src/Gui/QMapControl/src/wmsmapadapter.h \
+    src/Gui/QMapControl/src/tilemapadapter.h \
+    src/Gui/QMapControl/src/point.h \
+    src/Gui/QMapControl/src/osmmapadapter.h \
+    src/Gui/QMapControl/src/openaerialmapadapter.h \
+    src/Gui/QMapControl/src/mapnetwork.h \
+    src/Gui/QMapControl/src/maplayer.h \
+    src/Gui/QMapControl/src/mapcontrol.h \
+    src/Gui/QMapControl/src/mapadapter.h \
+    src/Gui/QMapControl/src/linestring.h \
+    src/Gui/QMapControl/src/layermanager.h \
+    src/Gui/QMapControl/src/layer.h \
+    src/Gui/QMapControl/src/imagepoint.h \
+    src/Gui/QMapControl/src/imagemanager.h \
+    src/Gui/QMapControl/src/gps_position.h \
+    src/Gui/QMapControl/src/googlesatmapadapter.h \
+    src/Gui/QMapControl/src/googlemapadapter.h \
+    src/Gui/QMapControl/src/geometrylayer.h \
+    src/Gui/QMapControl/src/geometry.h \
+    src/Gui/QMapControl/src/fixedimageoverlay.h \
+    src/Gui/QMapControl/src/emptymapadapter.h \
+    src/Gui/QMapControl/src/curve.h \
+    src/Gui/QMapControl/src/circlepoint.h \
+    src/Gui/mainwindow.hpp
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -49,4 +79,30 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Routing/metric.cpp \
     src/Routing/dijkstra.cpp \
     src/Routing/astar.cpp \
-    src/Database/spacefillingcurves.cpp
+    src/Database/spacefillingcurves.cpp \
+    src/Gui/QMapControl/src/yahoomapadapter.cpp \
+    src/Gui/QMapControl/src/wmsmapadapter.cpp \
+    src/Gui/QMapControl/src/tilemapadapter.cpp \
+    src/Gui/QMapControl/src/point.cpp \
+    src/Gui/QMapControl/src/osmmapadapter.cpp \
+    src/Gui/QMapControl/src/openaerialmapadapter.cpp \
+    src/Gui/QMapControl/src/mapnetwork.cpp \
+    src/Gui/QMapControl/src/maplayer.cpp \
+    src/Gui/QMapControl/src/mapcontrol.cpp \
+    src/Gui/QMapControl/src/mapadapter.cpp \
+    src/Gui/QMapControl/src/linestring.cpp \
+    src/Gui/QMapControl/src/layermanager.cpp \
+    src/Gui/QMapControl/src/layer.cpp \
+    src/Gui/QMapControl/src/imagepoint.cpp \
+    src/Gui/QMapControl/src/imagemanager.cpp \
+    src/Gui/QMapControl/src/gps_position.cpp \
+    src/Gui/QMapControl/src/googlesatmapadapter.cpp \
+    src/Gui/QMapControl/src/googlemapadapter.cpp \
+    src/Gui/QMapControl/src/geometrylayer.cpp \
+    src/Gui/QMapControl/src/geometry.cpp \
+    src/Gui/QMapControl/src/fixedimageoverlay.cpp \
+    src/Gui/QMapControl/src/emptymapadapter.cpp \
+    src/Gui/QMapControl/src/curve.cpp \
+    src/Gui/QMapControl/src/circlepoint.cpp \
+    src/Gui/mainwindow.cpp
+FORMS += src/Gui/mainwindow.ui

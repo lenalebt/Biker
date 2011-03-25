@@ -38,12 +38,12 @@ template<typename T>
 class Heap
 {
 public:
-	virtual boost::shared_ptr<T> removeMinimumCostNode()=0;
-	virtual void addNode(boost::shared_ptr<T> node)=0;
-	virtual void decreaseKey(boost::shared_ptr<T> node)=0;
-	virtual bool contains(ID_Datatype nodeID)=0;
-	virtual bool isEmpty()=0;
-	virtual int size()=0;
+    virtual boost::shared_ptr<T> removeMinimumCostNode()=0;
+    virtual void addNode(boost::shared_ptr<T> node)=0;
+    virtual void decreaseKey(boost::shared_ptr<T> node)=0;
+    virtual bool contains(ID_Datatype nodeID)=0;
+    virtual bool isEmpty()=0;
+    virtual int size()=0;
     virtual ~Heap() {}
 };
 

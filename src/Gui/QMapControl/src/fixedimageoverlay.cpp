@@ -44,7 +44,7 @@ namespace qmapcontrol
         size = mypixmap->size();
     }
 
-    void FixedImageOverlay::draw(QPainter* painter, const MapAdapter* mapadapter, const QRect &viewport, const QPoint offset)
+    void FixedImageOverlay::draw(QPainter* painter, const MapAdapter* mapadapter, const QRect &/*viewport*/, const QPoint /*offset*/)
     {
         if (!visible)
             return;
