@@ -1,4 +1,4 @@
-QT += xml
+QT += xml network
 INCLUDEPATH += /usr/include/
 LIBS += -L/usr/lib \
     -lcurl \
