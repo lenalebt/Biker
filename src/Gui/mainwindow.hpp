@@ -31,15 +31,24 @@ private:
     
     OSMDatabaseReader* dbreader;
     
-    void showRoute(GPSRoute r);
+    void showRoute(QList<GPSRoute> routeSections);
     
-    GPSPosition startPos, endPos;
+    QList<GPSPosition> waypointList;
+    QList<GPSRoute> routeSections;
+    
+    void calcRouteSection();
     
     
 public slots:
     void mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF coordinate );
     void menuOpenClicked();
     void menuCloseClicked();
+    void changeOptionPageL();
+    void changeOptionPageR();
+    void resetRoute();
+    void saveRoute();
+    void openRoute();
+    void removeLastWaypoint();
 };
 
 #endif // MAINWINDOW_HPP

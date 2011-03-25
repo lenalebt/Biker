@@ -9,7 +9,7 @@ MOC_DIR = obj
 UI_DIR = obj
 RCC_DIR = obj
 
-DESTDIR = bin
+#DESTDIR = bin
 profiling { 
     QMAKE_CFLAGS += -pg
     QMAKE_CXXFLAGS += -pg

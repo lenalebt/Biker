@@ -139,11 +139,11 @@ void GPSRoute::clear()
     waypointList.clear();
 }
 
-GPSRoute GPSRoute::importGPX(std::string gpxFilename)
+GPSRoute GPSRoute::importGPX(QString gpxFilename)
 {
     QDomDocument doc("gpxFile");
     GPSRoute r;
-    QFile file(gpxFilename.c_str());
+    QFile file(gpxFilename);
 
     if (!file.open(QIODevice::ReadOnly))
     {
@@ -226,7 +226,7 @@ GPSRoute GPSRoute::importGPX(std::string gpxFilename)
     return r;
 }
 
-void GPSRoute::exportGPX(std::string gpxFilename, GPSRoute r)
+void GPSRoute::exportGPX(QString gpxFilename, GPSRoute r)
 {
     QDomDocument doc("gpx");
     //zuerst das Grundelement erstellen, dann runter bis die Wegpunkte eingefügt werden.
@@ -255,7 +255,7 @@ void GPSRoute::exportGPX(std::string gpxFilename, GPSRoute r)
     }
 
     //Datei öffnen und so
-    QFile file(gpxFilename.c_str());
+    QFile file(gpxFilename);
     if (!file.open(QIODevice::WriteOnly))	//Versuche, die Datei zu öffnen
     {
         std::cerr << "Opening file for writing failed." << std::endl;
@@ -309,3 +309,12 @@ GPSPosition GPSRoute::getStartingPoint() const
         return GPSPosition();
 }
 
+void GPSRoute::addRoute(GPSRoute route)
+{
+    //Vorteil dieses Ansatzes: (0.0/0.0) wird keinesfalls hinzugefügt zur Route...
+    QList<GPSPosition> list = route.waypointList;
+    for (QList<GPSPosition>::iterator it = list.begin(); it < list.end(); it++)
+    {
+        this->addWaypoint(*it);
+    }
+}

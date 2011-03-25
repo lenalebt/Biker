@@ -50,6 +50,7 @@ public:
      */
     void addWaypoint(GPSPosition p);
 
+    void addRoute(GPSRoute route);
 
     /**
      * Fügt einen Wegpunkt am Anfang der Route hinzu.
@@ -97,13 +98,13 @@ public:
     /**
      * Diese Funktion importiert Daten aus einer GPX-Datei.
      */
-    static GPSRoute importGPX(std::string gpxFilename);
+    static GPSRoute importGPX(QString gpxFilename);
 
     /**
      * Diese Funktion exportiert die Route in das GPX-Format, sodass sie
      * von anderen Applikationen benutzt werden kann.
      */
-    static void exportGPX(std::string gpxFilename, GPSRoute r);
+    static void exportGPX(QString gpxFilename, GPSRoute r);
 
     /**
      * Dreht eine Route um, damit man sie in die entgegengesetzte Richtung befahren kann

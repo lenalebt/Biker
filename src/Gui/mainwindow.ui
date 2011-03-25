@@ -35,12 +35,153 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>220</width>
         <height>16777215</height>
        </size>
       </property>
-      <widget class="QWidget" name="page"/>
-      <widget class="QWidget" name="page_2"/>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="page">
+       <widget class="QPushButton" name="resetRoute">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>201</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Route zurücksetzen</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_3">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>0</y>
+          <width>101</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Routenoptionen</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="changeOptionPageR_1">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>0</y>
+          <width>21</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&gt;</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="changeOptionPageL_1">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>0</y>
+          <width>21</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&lt;</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="removeLastWaypoint">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>201</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>letzten Wegpunkt entfernen</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>131</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Umweg/Höhenmeter</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="altitudePenalty">
+        <property name="geometry">
+         <rect>
+          <x>140</x>
+          <y>30</y>
+          <width>55</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>20</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>0</y>
+          <width>171</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Parameter des Algorithmus</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="changeOptionPageL_2">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>0</y>
+          <width>21</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&lt;</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="changeOptionPageR_2">
+        <property name="geometry">
+         <rect>
+          <x>200</x>
+          <y>0</y>
+          <width>21</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&gt;</string>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -62,7 +203,15 @@
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
+   <widget class="QMenu" name="menuRoute">
+    <property name="title">
+     <string>Route</string>
+    </property>
+    <addaction name="actionOpenRoute"/>
+    <addaction name="actionSaveRoute"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuRoute"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionFile">
@@ -76,6 +225,16 @@
    </property>
   </action>
   <action name="actionOpen">
+   <property name="text">
+    <string>Open...</string>
+   </property>
+  </action>
+  <action name="actionSaveRoute">
+   <property name="text">
+    <string>Save...</string>
+   </property>
+  </action>
+  <action name="actionOpenRoute">
    <property name="text">
     <string>Open...</string>
    </property>

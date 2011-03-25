@@ -7,9 +7,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    dbreader(0),
-    startPos(),
-    endPos()
+    dbreader(0)
 {
     ui->setupUi(this);
     mapcontrol = new qmapcontrol::MapControl(QSize(1024, 768));
@@ -34,12 +32,27 @@ MainWindow::MainWindow(QWidget *parent) :
     layout = new QHBoxLayout(ui->mapwidget);
     layout->addWidget(mapcontrol);
     
-    mapcontrol->resize(ui->mapwidget->size());
+    mapcontrol->resize(QSize(ui->mapwidget->size().width()-20, ui->mapwidget->size().height()-20));
     
     connect(mapcontrol, SIGNAL(mouseEventCoordinate (const QMouseEvent*, const QPointF)), this, SLOT(mouseEventCoordinate (const QMouseEvent*, const QPointF)));
     
+    //Menü
     connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(menuCloseClicked()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(menuOpenClicked()));
+    connect(ui->actionOpenRoute, SIGNAL(triggered()), this, SLOT(openRoute()));
+    connect(ui->actionSaveRoute, SIGNAL(triggered()), this, SLOT(saveRoute()));
+    
+    //Weiterschalten der Seitenleiste
+    connect(ui->changeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
+    connect(ui->changeOptionPageR_1, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
+    connect(ui->changeOptionPageL_2, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
+    connect(ui->changeOptionPageR_2, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
+    
+    //Kram auf Seite1
+    connect(ui->resetRoute, SIGNAL(clicked()), this, SLOT(resetRoute()));
+    connect(ui->removeLastWaypoint, SIGNAL(clicked()), this, SLOT(removeLastWaypoint()));
+    
+    //Kram auf Seite2
 }
 
 MainWindow::~MainWindow()
@@ -52,40 +65,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::resizeEvent ( QResizeEvent * /*event*/ )
 {
-    mapcontrol->resize(QSize(ui->mapwidget->size().width()-20, ui->mapwidget->size().height()-20));
+    int height, width;
+    width = ui->mapwidget->size().width()-20;
+    height = ui->mapwidget->size().height()-20;
+    if (width < 400) width = 400;
+    if (height < 400) height = 400;
+    mapcontrol->resize(QSize(width, height));
 }
 
 void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF coordinate )
 {
-    static GPSPosition oldPos;
-    static bool setStartingPoint=true;
+    static GPSPosition clickPos;
+    bool dragged = false;
+    if ((evnt->button() == Qt::LeftButton) && (evnt->type() == QEvent::MouseButtonPress))
+    {
+        clickPos.setLat(evnt->posF().x());
+        clickPos.setLon(evnt->posF().y());
+    }
+    else
+    {
+        GPSPosition releasePos;
+        releasePos.setLat(evnt->posF().x());
+        releasePos.setLon(evnt->posF().y());
+        dragged = !(clickPos == releasePos);
+    }
     
     GPSPosition actPos = GPSPosition(coordinate.x(), coordinate.y());
-    if ((evnt->button() == Qt::LeftButton) && (evnt->type() == QEvent::MouseButtonRelease) && (actPos==oldPos))
+    
+    if ((evnt->button() == Qt::LeftButton) && (evnt->type() == QEvent::MouseButtonRelease))
     {
-        if (setStartingPoint)
+        if (!dragged && dbreader->isOpen())
         {
-            setStartingPoint = false;
-            startPos = actPos;
-        }
-        else
-        {
-            endPos = actPos;
-            setStartingPoint = true;
-            
-            if (dbreader->isOpen())
-            {
-                //Route berechnen
-                qDebug() << "AStar zusammenbauen";
-                AStar astar(dbreader, new BikeMetric(dbreader, 10), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
-                qDebug() << "Route berechnen";
-                GPSRoute r = astar.calcShortestRoute(startPos, endPos);
-                qDebug() << "Route anzeigen";
-                showRoute(r);
-            }
+            waypointList << actPos;
+            calcRouteSection();
         }
     }
-    oldPos = actPos;
 }
 void MainWindow::menuOpenClicked()
 {
@@ -119,7 +133,7 @@ void MainWindow::changeEvent(QEvent *e)
     }
 }
 
-void MainWindow::showRoute(GPSRoute r)
+void MainWindow::showRoute(QList<GPSRoute> routes)
 {
     qmapcontrol::Layer* l = new qmapcontrol::MapLayer("Route", mapadapter);
     
@@ -129,11 +143,19 @@ void MainWindow::showRoute(GPSRoute r)
     // create a LineString
     QList<qmapcontrol::Point*> points;
     
-    // "Blind" Points
-    qDebug() << "Route length: " << r.calcLength() << " meters";
-    for (int i=0; i<r.size(); i++)
+    if (!waypointList.isEmpty())
+        points.append(new qmapcontrol::ImagePoint(waypointList[0].getLon(), waypointList[0].getLat(), "images/marker-green.png", "", qmapcontrol::Point::Middle));
+    
+    if (!routes.isEmpty())
     {
-        points.append(new qmapcontrol::Point(r.getWaypoint(i).getLon(), r.getWaypoint(i).getLat(), ""));
+        for (QList<GPSRoute>::iterator it = routes.begin(); it < routes.end(); it++)
+        {
+            for (int i=0; i<it->size(); i++)
+            {
+                points.append(new qmapcontrol::Point(it->getWaypoint(i).getLon(), it->getWaypoint(i).getLat(), ""));
+            }
+            points.append(new qmapcontrol::ImagePoint(it->getWaypoint(it->size()-1).getLon(), it->getWaypoint(it->size()-1).getLat(), "images/marker-red.png", "", qmapcontrol::Point::Middle));
+        }
     }
 
     // A QPen also can use transparency
@@ -147,4 +169,60 @@ void MainWindow::showRoute(GPSRoute r)
     
     mapcontrol->repaint();
     mapcontrol->updateRequestNew();
+}
+
+void MainWindow::changeOptionPageL()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+void MainWindow::changeOptionPageR()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+}
+void MainWindow::resetRoute()
+{
+    routeSections.clear();
+    waypointList.clear();
+    showRoute(routeSections);
+}
+void MainWindow::saveRoute()
+{
+    QString filename = QFileDialog::getSaveFileName(this, QString::fromUtf8("Route speichern"), "", "*.gpx");
+    GPSRoute route;
+    if (routeSections.size() > 0)
+    {
+        route = routeSections[0];
+        for (QList<GPSRoute>::iterator it = routeSections.begin()+1; it < routeSections.end(); it++)
+        {
+            route.addRoute(*it);
+        }
+    }
+    GPSRoute::exportGPX(filename, route);
+}
+
+void MainWindow::openRoute()
+{
+    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Route öffnen"), "", "*.gpx");
+    GPSRoute route = GPSRoute::importGPX(filename);
+    routeSections << route;
+    waypointList << route.getWaypoint(0) << route.getWaypoint(route.size()-1);
+    showRoute(routeSections);
+}
+
+void MainWindow::calcRouteSection()
+{
+    if (waypointList.size()>1 && dbreader->isOpen())
+    {
+        AStar astar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+        GPSRoute newRouteSection = astar.calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+        routeSections << newRouteSection;
+        showRoute(routeSections);
+    }
+}
+
+void MainWindow::removeLastWaypoint()
+{
+    routeSections.removeLast();
+    waypointList.removeLast();
+    showRoute(routeSections);
 }
