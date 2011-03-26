@@ -210,8 +210,15 @@
     <addaction name="actionOpenRoute"/>
     <addaction name="actionSaveRoute"/>
    </widget>
+   <widget class="QMenu" name="menuPOIs">
+    <property name="title">
+     <string>POIs</string>
+    </property>
+    <addaction name="actionCamping"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuRoute"/>
+   <addaction name="menuPOIs"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionFile">
@@ -237,6 +244,14 @@
   <action name="actionOpenRoute">
    <property name="text">
     <string>Open...</string>
+   </property>
+  </action>
+  <action name="actionCamping">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Camping</string>
    </property>
   </action>
  </widget>

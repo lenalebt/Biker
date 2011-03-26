@@ -26,15 +26,19 @@ private:
     qmapcontrol::MapControl* mapcontrol;
     qmapcontrol::MapAdapter* mapadapter;
     qmapcontrol::Layer* mainlayer;
+    qmapcontrol::Layer* routeLayer;
+    qmapcontrol::Layer* poiLayer;
     
     QHBoxLayout* layout;
     
     OSMDatabaseReader* dbreader;
     
     void showRoute(QList<GPSRoute> routeSections);
+    void showPOIList(QList<boost::shared_ptr<OSMNode> > pois);
     
     QList<GPSPosition> waypointList;
     QList<GPSRoute> routeSections;
+    QList<boost::shared_ptr<OSMNode> > poiList;
     
     void calcRouteSection();
     
@@ -49,6 +53,7 @@ public slots:
     void saveRoute();
     void openRoute();
     void removeLastWaypoint();
+    void showCampingPOIs(bool show);
 };
 
 #endif // MAINWINDOW_HPP

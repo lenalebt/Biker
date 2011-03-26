@@ -7,6 +7,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+    routeLayer(0),
+    poiLayer(0),
     dbreader(0)
 {
     ui->setupUi(this);
@@ -21,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // add Layer to the MapControl
     mapcontrol->addLayer(mainlayer);
+    mapcontrol->enablePersistentCache(QDir("./data/tiles"));
     
     mapcontrol->setMaximumSize(1680, 1050);
     mapcontrol->setZoom(11);
@@ -41,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(menuOpenClicked()));
     connect(ui->actionOpenRoute, SIGNAL(triggered()), this, SLOT(openRoute()));
     connect(ui->actionSaveRoute, SIGNAL(triggered()), this, SLOT(saveRoute()));
+    connect(ui->actionCamping, SIGNAL(toggled(bool)), this, SLOT(showCampingPOIs(bool)));
     
     //Weiterschalten der Seitenleiste
     connect(ui->changeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
@@ -135,10 +139,13 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::showRoute(QList<GPSRoute> routes)
 {
-    qmapcontrol::Layer* l = new qmapcontrol::MapLayer("Route", mapadapter);
+    if (routeLayer == 0)
+    {
+        routeLayer = new qmapcontrol::MapLayer("Route", mapadapter);
+        mapcontrol->addLayer(routeLayer);
+    }
     
-    mapcontrol->layers().clear();
-    mapcontrol->addLayer(l);
+    routeLayer->clearGeometries();
     
     // create a LineString
     QList<qmapcontrol::Point*> points;
@@ -165,7 +172,7 @@ void MainWindow::showRoute(QList<GPSRoute> routes)
     qmapcontrol::LineString* ls = new qmapcontrol::LineString(points, "Route", linepen);
     
     // Add the LineString to the layer
-    l->addGeometry(ls);
+    routeLayer->addGeometry(ls);
     
     mapcontrol->repaint();
     mapcontrol->updateRequestNew();
@@ -216,13 +223,50 @@ void MainWindow::calcRouteSection()
         AStar astar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
         GPSRoute newRouteSection = astar.calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
         routeSections << newRouteSection;
-        showRoute(routeSections);
     }
+    showRoute(routeSections);
 }
 
 void MainWindow::removeLastWaypoint()
 {
-    routeSections.removeLast();
-    waypointList.removeLast();
+    if (routeSections.size()>0) routeSections.removeLast();
+    if (waypointList.size()>0) waypointList.removeLast();
     showRoute(routeSections);
+}
+
+void MainWindow::showPOIList(QList<boost::shared_ptr<OSMNode> > pois)
+{
+    if (poiLayer == 0)
+    {
+        poiLayer = new qmapcontrol::MapLayer("POIs", mapadapter);
+        mapcontrol->addLayer(poiLayer);
+    }
+    
+    poiLayer->clearGeometries();
+    
+    for (QList<boost::shared_ptr<OSMNode> >::iterator it = pois.begin(); it < pois.end(); it++)
+    {
+        poiLayer->addGeometry(new qmapcontrol::ImagePoint((*it)->getLon(), (*it)->getLat(), "images/marker-big-green.png", "", qmapcontrol::Point::BottomLeft));
+    }
+    
+    mapcontrol->repaint();
+    mapcontrol->updateRequestNew();
+}
+void MainWindow::showCampingPOIs(bool show)
+{
+    if (show && dbreader->isOpen())
+    {
+        OSMProperty camp_site("tourism", "camp_site");
+        OSMPropertyTree* tree = new OSMPropertyTreePropertyNode(camp_site);
+        GPSPosition pos = GPSPosition(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y());
+        poiList = dbreader->getNodes(pos, 4000.0, *tree);
+        delete tree;
+        qDebug() << "found " << poiList.size() << " points.";
+        showPOIList(poiList);
+    }
+    else
+    {
+        poiList.clear();
+        showPOIList(poiList);
+    }
 }

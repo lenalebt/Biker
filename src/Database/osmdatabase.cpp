@@ -42,7 +42,7 @@ OSMInMemoryDatabase::~OSMInMemoryDatabase()
     delete curve;
 }
 
-QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& /*props*/)
+QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)
 {
     double lBoundX, uBoundX, lBoundY, uBoundY;
 	lBoundX = searchMidPoint.calcPositionInDistance(270.0, radius).getLon();
@@ -55,7 +55,18 @@ QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPositi
     int uBound = curve->getBucketID(uBoundX, uBoundY);
     for (int i=lBound; i<=uBound; i++)
     {
-        nodeList << nodePlaceMap.values(i);
+        QList<boost::shared_ptr<OSMNode> > tmpPointList = nodePlaceMap.values(i);
+        for (QList<boost::shared_ptr<OSMNode> >::iterator it = tmpPointList.begin(); it < tmpPointList.end(); it++)
+        {
+            QList<OSMProperty> propList = (*it)->getProperties();
+            props.resetPropertiesFound();
+            for (QList<OSMProperty>::iterator propIt = propList.begin(); propIt < propList.end(); propIt++)
+            {
+                props.propertyFound(*propIt);
+            }
+            if (props.evaluate())
+                nodeList << *it;
+        }
     }
     
     return nodeList;
