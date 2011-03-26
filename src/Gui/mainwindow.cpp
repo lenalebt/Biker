@@ -256,7 +256,7 @@ void MainWindow::showCampingPOIs(bool show)
 {
     if (show && dbreader->isOpen())
     {
-        OSMProperty camp_site("tourism", "camp_site");
+        OSMProperty camp_site("amenity", "recycling");
         OSMPropertyTree* tree = new OSMPropertyTreePropertyNode(camp_site);
         GPSPosition pos = GPSPosition(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y());
         poiList = dbreader->getNodes(pos, 4000.0, *tree);
