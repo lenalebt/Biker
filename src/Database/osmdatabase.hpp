@@ -76,6 +76,7 @@ public:
 	boost::shared_ptr<OSMNode> getNode(ID_Datatype id);
 	
 	bool openDatabase(QString filename);
+    bool openDatabase(QString filename, bool extendedParsing);
 	bool isOpen();
 	void closeDatabase();
     
@@ -91,6 +92,7 @@ private:
 	std::string dbFilename;
     bool dbOpen;
     SpaceFillingCurve* curve;
+    bool extendedParsing;
     
     QMultiMap<ID_Datatype, boost::shared_ptr<OSMEdge> > edgeMap;
     QMap<ID_Datatype, boost::shared_ptr<OSMNode> > nodeMap;

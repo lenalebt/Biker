@@ -245,12 +245,13 @@ void GPSRoute::exportGPX(QString gpxFilename, GPSRoute r)
     trkNode.appendChild(trkSegNode);
 
     QDomElement trkPoint;
+    QLocale locale(QLocale::C); //sonst schreibt er in eine GPX-Datei Kommas statt Punkte
     //Wegpunkt zur Liste hinzutun
     for (int i=0; i<r.size(); i++)
     {
         trkPoint = doc.createElement("trkpt");
-        trkPoint.setAttribute("lon", r.getWaypoint(i).getLon());
-        trkPoint.setAttribute("lat", r.getWaypoint(i).getLat());
+        trkPoint.setAttribute("lon", locale.toString(r.getWaypoint(i).getLon()));
+        trkPoint.setAttribute("lat", locale.toString(r.getWaypoint(i).getLat()));
         trkSegNode.appendChild(trkPoint);
     }
 

@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
     dbreader(0)
 {
     ui->setupUi(this);
+    setWindowTitle("Biker");
+    
     mapcontrol = new qmapcontrol::MapControl(QSize(1024, 768));
     mapcontrol->showScale(true);
 
@@ -45,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionOpenRoute, SIGNAL(triggered()), this, SLOT(openRoute()));
     connect(ui->actionSaveRoute, SIGNAL(triggered()), this, SLOT(saveRoute()));
     connect(ui->actionCamping, SIGNAL(toggled(bool)), this, SLOT(showCampingPOIs(bool)));
+    connect(ui->actionShowSpecialPOI, SIGNAL(toggled(bool)), this, SLOT(showSpecialPOIs(bool)));
     
     //Weiterschalten der Seitenleiste
     connect(ui->changeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
@@ -86,7 +89,7 @@ void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF c
         clickPos.setLat(evnt->posF().x());
         clickPos.setLon(evnt->posF().y());
     }
-    else
+    else if ((evnt->button() == Qt::LeftButton) && (evnt->type() == QEvent::MouseButtonRelease))
     {
         GPSPosition releasePos;
         releasePos.setLat(evnt->posF().x());
@@ -98,7 +101,7 @@ void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF c
     
     if ((evnt->button() == Qt::LeftButton) && (evnt->type() == QEvent::MouseButtonRelease))
     {
-        if (!dragged && dbreader->isOpen())
+        if ((dbreader != 0) && !dragged && dbreader->isOpen())
         {
             waypointList << actPos;
             calcRouteSection();
@@ -115,9 +118,32 @@ void MainWindow::menuOpenClicked()
             dbreader->closeDatabase();
             delete dbreader;
         }
+        
+        QMessageBox msgBox;
+        msgBox.setText("Extended parsing?");
+        msgBox.setInformativeText("Extended parsing lets you show some more POIs, but it takes longer to load the data file.");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
+        
+        setWindowTitle("Biker - loading...");
+        
         dbreader = new OSMInMemoryDatabase();
-        dbreader->openDatabase(filename);
-        //QMessageBox msgBox; msgBox.setText(QString::fromUtf8("Datenbank geöffnet.")); msgBox.exec();
+        bool success = false;
+        if (ret == QMessageBox::Yes)
+            success = ((OSMInMemoryDatabase*)dbreader)->openDatabase(filename, true);
+        else
+            success = dbreader->openDatabase(filename);
+        if (!success)
+        {
+            setWindowTitle("Biker");
+            QMessageBox msgBox; msgBox.setText(QString::fromUtf8("Error while loading database.")); msgBox.exec();
+            delete dbreader;
+        }
+        else
+        {
+            setWindowTitle(QString("Biker - ") + filename);
+        }
     }
 }
 void MainWindow::menuCloseClicked()
@@ -153,6 +179,7 @@ void MainWindow::showRoute(QList<GPSRoute> routes)
     if (!waypointList.isEmpty())
         points.append(new qmapcontrol::ImagePoint(waypointList[0].getLon(), waypointList[0].getLat(), "images/marker-green.png", "", qmapcontrol::Point::Middle));
     
+    double routeLength = 0.0;
     if (!routes.isEmpty())
     {
         for (QList<GPSRoute>::iterator it = routes.begin(); it < routes.end(); it++)
@@ -162,8 +189,11 @@ void MainWindow::showRoute(QList<GPSRoute> routes)
                 points.append(new qmapcontrol::Point(it->getWaypoint(i).getLon(), it->getWaypoint(i).getLat(), ""));
             }
             points.append(new qmapcontrol::ImagePoint(it->getWaypoint(it->size()-1).getLon(), it->getWaypoint(it->size()-1).getLat(), "images/marker-red.png", "", qmapcontrol::Point::Middle));
+            routeLength += it->calcLength();
         }
     }
+    QLocale locale(QLocale::C);
+    ui->lblRouteLength->setText(locale.toString(routeLength/1000, 'f', 2 ) + " km");
 
     // A QPen also can use transparency
     QPen* linepen = new QPen(QColor(0, 0, 255, 100));
@@ -218,10 +248,27 @@ void MainWindow::openRoute()
 
 void MainWindow::calcRouteSection()
 {
-    if (waypointList.size()>1 && dbreader->isOpen())
+    if ((dbreader != 0) && waypointList.size()>1 && dbreader->isOpen())
     {
-        AStar astar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
-        GPSRoute newRouteSection = astar.calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+        AStar* astar;
+        if (ui->cmbRoutingMetric->currentIndex() == 0)
+        {
+            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+        }
+        else if (ui->cmbRoutingMetric->currentIndex() == 1)
+        {
+            astar = new AStar(dbreader, new EuclidianMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+        }
+        else if (ui->cmbRoutingMetric->currentIndex() == 2)
+        {
+            astar = new AStar(dbreader, new CarMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+        }
+        else if (ui->cmbRoutingMetric->currentIndex() == 3)
+        {
+            astar = new AStar(dbreader, new FastRoutingMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+        }
+        GPSRoute newRouteSection = astar->calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+        delete astar;
         routeSections << newRouteSection;
     }
     showRoute(routeSections);
@@ -238,7 +285,7 @@ void MainWindow::showPOIList(QList<boost::shared_ptr<OSMNode> > pois)
 {
     if (poiLayer == 0)
     {
-        poiLayer = new qmapcontrol::MapLayer("POIs", mapadapter);
+        poiLayer = new qmapcontrol::GeometryLayer("POIs", mapadapter);
         mapcontrol->addLayer(poiLayer);
     }
     
@@ -254,12 +301,39 @@ void MainWindow::showPOIList(QList<boost::shared_ptr<OSMNode> > pois)
 }
 void MainWindow::showCampingPOIs(bool show)
 {
-    if (show && dbreader->isOpen())
+    if ((dbreader != 0) && show && dbreader->isOpen())
     {
-        OSMProperty camp_site("amenity", "recycling");
+        OSMProperty camp_site("tourism", "camp_site");
         OSMPropertyTree* tree = new OSMPropertyTreePropertyNode(camp_site);
         GPSPosition pos = GPSPosition(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y());
-        poiList = dbreader->getNodes(pos, 4000.0, *tree);
+        poiList = dbreader->getNodes(pos, 20000.0, *tree);
+        delete tree;
+        qDebug() << "found " << poiList.size() << " points.";
+        showPOIList(poiList);
+    }
+    else
+    {
+        poiList.clear();
+        showPOIList(poiList);
+    }
+}
+
+void MainWindow::showSpecialPOIs(bool show)
+{
+    if ((dbreader != 0) && show && dbreader->isOpen())
+    {
+        bool ok;
+        QString key = QInputDialog::getText(this, tr("Enter OSM Key"), tr("OSM key:"), QLineEdit::Normal, "amenity", &ok);
+        if (!ok) return;
+        QString value = QInputDialog::getText(this, tr("Enter OSM Value"), tr("OSM value:"), QLineEdit::Normal, "post_box", &ok);
+        if (!ok) return;
+        double radius = QInputDialog::getDouble(this, tr("Enter search radius"), tr("Radius:"), 4000.0, 500, 50000, 0, &ok);
+        if (!ok) return;
+        
+        OSMProperty camp_site(key, value);
+        OSMPropertyTree* tree = new OSMPropertyTreePropertyNode(camp_site);
+        GPSPosition pos = GPSPosition(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y());
+        poiList = dbreader->getNodes(pos, radius, *tree);
         delete tree;
         qDebug() << "found " << poiList.size() << " points.";
         showPOIList(poiList);

@@ -25,14 +25,14 @@ float OSMDatabaseReader::getAltitude(float lon, float lat)
 
 
 OSMInMemoryDatabase::OSMInMemoryDatabase()
-        : dbOpen(false)
+        : dbOpen(false), extendedParsing(false)
 {
     closeDatabase();
     curve = new ZOrderCurve();
 }
 
 OSMInMemoryDatabase::OSMInMemoryDatabase(SpaceFillingCurve* curve)
-        : dbOpen(false), curve(curve)
+        : dbOpen(false), curve(curve), extendedParsing(false)
 {
     
 }
@@ -58,14 +58,17 @@ QList<boost::shared_ptr<OSMNode> > OSMInMemoryDatabase::getNodes(const GPSPositi
         QList<boost::shared_ptr<OSMNode> > tmpPointList = nodePlaceMap.values(i);
         for (QList<boost::shared_ptr<OSMNode> >::iterator it = tmpPointList.begin(); it < tmpPointList.end(); it++)
         {
-            QList<OSMProperty> propList = (*it)->getProperties();
-            props.resetPropertiesFound();
-            for (QList<OSMProperty>::iterator propIt = propList.begin(); propIt < propList.end(); propIt++)
+            if (searchMidPoint.calcDistance(**it) < radius)
             {
-                props.propertyFound(*propIt);
+                QList<OSMProperty> propList = (*it)->getProperties();
+                props.resetPropertiesFound();
+                for (QList<OSMProperty>::iterator propIt = propList.begin(); propIt < propList.end(); propIt++)
+                {
+                    props.propertyFound(*propIt);
+                }
+                if (props.evaluate())
+                    nodeList << *it;
             }
-            if (props.evaluate())
-                nodeList << *it;
         }
     }
     
@@ -174,6 +177,62 @@ void OSMInMemoryDatabase::addWay(OSMWay* way)
         oldID = *it;
     }
     
+    /* Extended parsing soll POIs, die als closed Ways gespeichert sind,
+     * der Menge Nodes hinzuzufügen. Dadurch wird eine Suche vereinfacht.
+     *
+     */
+    if (extendedParsing)
+    {
+        if (memberList.size() > 2)
+        {   //nur bei closed Ways, die mindestens 3 Elemente haben
+            if (memberList[0] == memberList[memberList.size()-1])
+            {
+                if (way->getProperties().size() != 0)
+                {   //closed Ways ohne Eigenschaften sind uninteressant
+                    //Gebäude ausschließen, sofern sie keine anderen Eigenschaften haben
+                    bool goodClosedWay = false;
+                    QList<OSMProperty> propList = way->getProperties();
+                    for (QList<OSMProperty>::iterator it = propList.begin(); it < propList.end(); it++)
+                    {
+                        if ((it->getKey() != "building") && (it->getKey() != "layer") && (it->getKey() != "source"))
+                        {
+                            goodClosedWay = true;
+                            break;
+                        }
+                    }
+                    if (goodClosedWay)
+                    {
+                        double meanLon=0, meanLat=0;
+                        int count = 0;
+                        for (QList<ID_Datatype>::iterator it = memberList.begin(); it < memberList.end(); it++)
+                        {
+                            boost::shared_ptr<OSMNode> node = nodeMap[*it];
+                            if (node.get() != 0)
+                            {
+                                //System.err.println("Node Lon/Lat:" + node.getLon() + "/" + node.getLat());
+                                meanLon += node->getLon();
+                                meanLat += node->getLat();
+                                count++;
+                            }
+                        }
+                        meanLat /= count;
+                        meanLon /= count;
+                        
+                        //neue nodeID erzeugen, die es noch nicht gibt...
+                        ID_Datatype nodeID = ((rand() % 32768) << 16) + (rand() % 32768);
+                        while ((nodeMap[nodeID].get()) != 0 && (nodeID == 0))
+                        {
+                            nodeID = ((rand() % 32768) << 16) + (rand() % 32768);
+                        }
+                        
+                        OSMNode* node = new OSMNode(nodeID, GPSPosition(meanLon, meanLat), propList);
+                        addNode(node);
+                    }
+                }
+            }
+        }
+    }
+    
     delete way;
 }
 void OSMInMemoryDatabase::addRelation(OSMRelation* relation)
@@ -184,4 +243,10 @@ void OSMInMemoryDatabase::addRelation(OSMRelation* relation)
 void OSMInMemoryDatabase::finished()
 {
     //nichts zu tun.
+}
+
+bool OSMInMemoryDatabase::openDatabase(QString filename, bool extendedParsing)
+{
+    this->extendedParsing = extendedParsing;
+    return openDatabase(filename);
 }

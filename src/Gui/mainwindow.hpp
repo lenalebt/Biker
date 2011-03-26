@@ -54,6 +54,7 @@ public slots:
     void openRoute();
     void removeLastWaypoint();
     void showCampingPOIs(bool show);
+    void showSpecialPOIs(bool show);
 };
 
 #endif // MAINWINDOW_HPP
