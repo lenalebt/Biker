@@ -40,7 +40,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page">
        <widget class="QPushButton" name="resetRoute">
@@ -124,7 +124,7 @@
        <widget class="QLabel" name="lblRouteLength">
         <property name="geometry">
          <rect>
-          <x>120</x>
+          <x>130</x>
           <y>100</y>
           <width>81</width>
           <height>16</height>
@@ -136,38 +136,6 @@
        </widget>
       </widget>
       <widget class="QWidget" name="page_2">
-       <widget class="QLabel" name="label">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>30</y>
-          <width>161</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Umweg/Höhenmeter in m</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="altitudePenalty">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>30</y>
-          <width>55</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-        <property name="singleStep">
-         <number>1</number>
-        </property>
-        <property name="value">
-         <number>20</number>
-        </property>
-       </widget>
        <widget class="QLabel" name="label_2">
         <property name="geometry">
          <rect>
@@ -211,7 +179,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>80</y>
+          <y>40</y>
           <width>221</width>
           <height>25</height>
          </rect>
@@ -241,7 +209,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>60</y>
+          <y>20</y>
           <width>111</width>
           <height>16</height>
          </rect>
@@ -249,6 +217,54 @@
         <property name="text">
          <string>Routingmetrik:</string>
         </property>
+       </widget>
+       <widget class="QStackedWidget" name="stackedWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>70</y>
+          <width>221</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="page_3">
+         <widget class="QSpinBox" name="altitudePenalty">
+          <property name="geometry">
+           <rect>
+            <x>160</x>
+            <y>10</y>
+            <width>55</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+          <property name="singleStep">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>20</number>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>10</y>
+            <width>161</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>max. Umweg/Höhenmeter</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="page_4"/>
        </widget>
       </widget>
      </widget>
@@ -261,7 +277,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

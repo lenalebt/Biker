@@ -267,6 +267,10 @@ void MainWindow::calcRouteSection()
         {
             astar = new AStar(dbreader, new FastRoutingMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
+        else
+        {
+            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+        }
         GPSRoute newRouteSection = astar->calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
         delete astar;
         routeSections << newRouteSection;
