@@ -58,6 +58,7 @@ public slots:
     void showCampingPOIs(bool show);
     void showSpecialPOIs(bool show);
     void changeRoutingOptionPage(int index);
+    void showElevationProfile();
 };
 
 #endif // MAINWINDOW_HPP

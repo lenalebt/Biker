@@ -4,6 +4,7 @@
 #include <iostream>
 #include "src/Routing/astar.hpp"
 #include "src/Toolbox/Settings.hpp"
+#include "src/Gui/elevationprofilewidget.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -45,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSaveRoute, SIGNAL(triggered()), this, SLOT(saveRoute()));
     connect(ui->actionCamping, SIGNAL(toggled(bool)), this, SLOT(showCampingPOIs(bool)));
     connect(ui->actionShowSpecialPOI, SIGNAL(toggled(bool)), this, SLOT(showSpecialPOIs(bool)));
+    connect(ui->actionShowElevationProfile, SIGNAL(triggered()), this, SLOT(showElevationProfile()));
     
     //Weiterschalten der Seitenleiste
     connect(ui->butChangeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
@@ -420,4 +422,11 @@ void MainWindow::saveSettings()
     s->setStandardPosition(GPSPosition(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y()));
     s->setZoom(mapcontrol->currentZoom());
     s->saveXML();
+}
+void MainWindow::showElevationProfile()
+{
+    ElevationProfileWidget widget(dbreader);
+    widget.resize(320,240);
+    widget.show();
+    qDebug() << "TODO: Show Window."
 }

@@ -923,6 +923,8 @@
     </property>
     <addaction name="actionOpenRoute"/>
     <addaction name="actionSaveRoute"/>
+    <addaction name="separator"/>
+    <addaction name="actionShowElevationProfile"/>
    </widget>
    <widget class="QMenu" name="menuPOIs">
     <property name="title">
@@ -975,6 +977,11 @@
    </property>
    <property name="text">
     <string>Special POI...</string>
+   </property>
+  </action>
+  <action name="actionShowElevationProfile">
+   <property name="text">
+    <string>Show Elevation profile...</string>
    </property>
   </action>
  </widget>
