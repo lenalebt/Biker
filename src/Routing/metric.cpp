@@ -154,15 +154,15 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 		for (QList<OSMProperty>::iterator it = propList.begin(); it < propList.end(); it++)
 		{
 			if (*it == OSMProperty("highway", "traffic_lights"))
-				penalty += 60.0;	//30m Strafweg für Ampeln.
+				penalty += penalty_Highway_Trafficlights;	//xm Strafweg für Ampeln.
 			else if (*it == OSMProperty("barrier", "cycle_barrier"))
-				penalty += 40.0;	//30m Strafweg für Umlaufgitter.
+				penalty += penalty_Barrier_Cycle;	//40m Strafweg für Umlaufgitter.
 			else if (*it == OSMProperty("barrier", "bollard"))
-				penalty += 5.0;		//5m Strafweg für Poller.
+				penalty += penalty_Barrier_Cycle;		//5m Strafweg für Poller.
 			else if (*it == OSMProperty("barrier", "gate"))
-				penalty += 20.0;	//10m Strafweg für Tore.
+				penalty += penalty_Barrier_Cycle;	//10m Strafweg für Tore.
 			else if (*it == OSMProperty("barrier", "lift_gate"))
-				penalty += 20.0;	//10m Strafweg für Schranken.
+				penalty += penalty_Barrier_Cycle;	//10m Strafweg für Schranken.
 		}
 		
 		/* Hier werden bestimmte Straßenverhältnisse mit Strafwerten belegt. Je nach Länge der
@@ -182,17 +182,17 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 		{	//mit Radweg ist alles etwas anders, daher trennen.
 			for (QList<OSMProperty>::iterator it = propList.begin(); it < propList.end(); it++)
 			{
-				penalty += distance * 0.1;	//Kein Radweg? Erstmal 10% Strafweg.
+				penalty += distance * penalty_NoCycleway;	//Kein Radweg? Erstmal 10% Strafweg.
 				if (*it == OSMProperty("highway", "primary"))
-					penalty += distance * 0.3;	//30% Strafweg für große Straßen ohne Radweg. Ist ja gefährlich.
+					penalty += distance * penalty_NoCycleway_HighwayPrimary;	//30% Strafweg für große Straßen ohne Radweg. Ist ja gefährlich.
 				else if (*it == OSMProperty("highway", "secondary"))
-					penalty += distance * 0.2;	//20% Strafe für kleinere Straßen
+					penalty += distance * penalty_NoCycleway_HighwaySecondary;	//20% Strafe für kleinere Straßen
 				else if (*it == OSMProperty("highway", "tertiary"))
-					penalty += distance * 0.15;	//15% Strafe für kleinere Straßen
+					penalty += distance * penalty_NoCycleway_HighwayTertiary;	//15% Strafe für kleinere Straßen
 				else if (*it == OSMProperty("highway", "steps"))
 				{
 					//Okay, mal sehen ob man die Stufenzahl sehen kann.
-					int index = -1;//propList.indexOf(Property("step_count",""));
+					int index = -1;//propList.indexOf(Property("step_count",""));//TODO
 					if (index != -1)
 					{
 						double step_count = propList[index].getValue().toDouble();
@@ -206,15 +206,36 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 					}
 				}
                 else if (*it == OSMProperty("highway", "path"))
-					penalty += distance * 0.2;	//20% Strafe für Feldwege und sowas
+					penalty += distance * penalty_NoCycleway_HighwayPath;	//20% Strafe für Feldwege und sowas
+                else if ((*it == OSMProperty("bicycle", "dismount")) || (*it == OSMProperty("highway", "pedestrian")))
+					penalty += distance * penalty_NoCycleway_Dismount;
 				
 			}
 		}
+        else
+        {
+			for (QList<OSMProperty>::iterator it = propList.begin(); it < propList.end(); it++)
+			{
+				if (*it == OSMProperty("highway", "primary"))
+					penalty += distance * penalty_Cycleway_HighwayPrimary;	//30% Strafweg für große Straßen ohne Radweg. Ist ja gefährlich.
+				else if (*it == OSMProperty("highway", "secondary"))
+					penalty += distance * penalty_Cycleway_HighwaySecondary;	//20% Strafe für kleinere Straßen
+				else if (*it == OSMProperty("highway", "tertiary"))
+					penalty += distance * penalty_Cycleway_HighwayTertiary;	//15% Strafe für kleinere Straßen
+				//else if (*it == OSMProperty("highway", "steps"))  //keine Treppen erlauben Fahrräder, und wenn ist das murks.
+                else if (*it == OSMProperty("highway", "path"))
+					penalty += distance * penalty_Cycleway_HighwayPath;	//20% Strafe für Feldwege und sowas
+                else if (*it == OSMProperty("bicycle", "dismount"))
+                    penalty += distance * penalty_NoCycleway_Dismount;  //fürs Absteigen gibts die gleiche Strafe wie ohne Radweg
+			}
+        }
+        
+        //TODO: Unabhängig ob Radweg oder nicht: Die Qualität der Straße sollte mit einfließen in die Berechnung, sofern Infos vorhanden.
         
         if (db != 0)
         {
             penalty += fabs((db->getAltitude(startNode.getLon(), startNode.getLat()) - db->getAltitude(endNode.getLon(), endNode.getLat())))
-                        * altitudePenalty; //jeder Höhenmeter wird bestraft mit x m Umweg.
+                        * penalty_Altitude; //jeder Höhenmeter wird bestraft mit x m Umweg.
         }
         
 		return distance + penalty;
@@ -249,7 +270,8 @@ boost::shared_ptr<OSMPropertyTree> BikeMetric::getAssociatedPropertyTree()
         propListA << OSMProperty("cycleway","track");
         propListA << OSMProperty("cycleway","lane");
         propListA << OSMProperty("bicycle","yes");
-		propListA << OSMProperty("highway","steps");		//nur erlaubt unter hohen Kosten.
+		propListA << OSMProperty("highway","steps");		//nur erlaubt unter hohen Kosten (schieben).
+        propListA << OSMProperty("highway","pedestrian");	//nur erlaubt unter hohen Kosten (schieben).
 		boost::shared_ptr<OSMPropertyTree> propTreeA(OSMPropertyTree::convertToOrPropertyTree(propListA));
 		
 		//Fußgängerwege nur, wenn Räder zugelassen sind

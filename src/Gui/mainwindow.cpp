@@ -3,6 +3,7 @@
 #include "src/Gui/QMapControl/qmapcontrol.h"
 #include <iostream>
 #include "src/Routing/astar.hpp"
+#include "src/Toolbox/Settings.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,14 +26,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // add Layer to the MapControl
     mapcontrol->addLayer(mainlayer);
-    mapcontrol->enablePersistentCache(QDir("./data/tiles"));
+    mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles"));
     
     mapcontrol->setMaximumSize(1680, 1050);
     mapcontrol->setZoom(11);
-    QList<QPointF> view;
-    view.append(QPointF(7.48, 51.356));
-    view.append(QPointF(7.49, 51.357));
-    mapcontrol->setView(view);
     
     layout = new QHBoxLayout(ui->mapwidget);
     layout->addWidget(mapcontrol);
@@ -50,20 +47,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionShowSpecialPOI, SIGNAL(toggled(bool)), this, SLOT(showSpecialPOIs(bool)));
     
     //Weiterschalten der Seitenleiste
-    connect(ui->changeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
-    connect(ui->changeOptionPageR_1, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
-    connect(ui->changeOptionPageL_2, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
-    connect(ui->changeOptionPageR_2, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
+    connect(ui->butChangeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
+    connect(ui->butChangeOptionPageR_1, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
+    connect(ui->butChangeOptionPageL_2, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
+    connect(ui->butChangeOptionPageR_2, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
     
     //Kram auf Seite1
-    connect(ui->resetRoute, SIGNAL(clicked()), this, SLOT(resetRoute()));
-    connect(ui->removeLastWaypoint, SIGNAL(clicked()), this, SLOT(removeLastWaypoint()));
+    connect(ui->butResetRoute, SIGNAL(clicked()), this, SLOT(resetRoute()));
+    connect(ui->butRemoveLastWaypoint, SIGNAL(clicked()), this, SLOT(removeLastWaypoint()));
     
     //Kram auf Seite2
+    connect(ui->cmbRoutingMetric, SIGNAL(currentIndexChanged(int)), this, SLOT(changeRoutingOptionPage(int)));
+    
+    //Einstellungen laden
+    loadSettings();
 }
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
     delete ui;
     if (dbreader != 0)
         dbreader->closeDatabase();
@@ -253,7 +255,24 @@ void MainWindow::calcRouteSection()
         AStar* astar;
         if (ui->cmbRoutingMetric->currentIndex() == 0)
         {
-            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            BikeMetric* bm = new BikeMetric(dbreader);
+            bm->setPenalty_Altitude(ui->txtAltitudePenalty->value());
+            bm->setPenalty_Barrier_Cycle(ui->txtCycleBarrier->value());
+            bm->setPenalty_Highway_Trafficlights(ui->txtHighwayTrafficlights->value());
+            
+            bm->setPenalty_NoCycleway(ui->txtNoCycleway->value() / 100.0);
+            bm->setPenalty_NoCycleway_HighwayPath(ui->txtNoCycleway_HighwayPath->value() / 100.0);
+            bm->setPenalty_NoCycleway_HighwayPrimary(ui->txtNoCycleway_HighwayPrimary->value() / 100.0);
+            bm->setPenalty_NoCycleway_HighwaySecondary(ui->txtNoCycleway_HighwaySecondary->value() / 100.0);
+            bm->setPenalty_NoCycleway_HighwayTertiary(ui->txtNoCycleway_HighwayTertiary->value() / 100.0);
+            bm->setPenalty_NoCycleway_Dismount(ui->txtNoCycleway_Dismount->value() / 100.0);
+            
+            bm->setPenalty_Cycleway_HighwayPath(ui->txtCycleway_HighwayPath->value() / 100.0);
+            bm->setPenalty_Cycleway_HighwayPrimary(ui->txtCycleway_HighwayPrimary->value() / 100.0);
+            bm->setPenalty_Cycleway_HighwaySecondary(ui->txtCycleway_HighwaySecondary->value() / 100.0);
+            bm->setPenalty_Cycleway_HighwayTertiary(ui->txtCycleway_HighwayTertiary->value() / 100.0);
+            
+            astar = new AStar(dbreader, bm, new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         else if (ui->cmbRoutingMetric->currentIndex() == 1)
         {
@@ -269,11 +288,16 @@ void MainWindow::calcRouteSection()
         }
         else
         {
-            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->altitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->txtAltitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         GPSRoute newRouteSection = astar->calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
         delete astar;
-        routeSections << newRouteSection;
+        if (!newRouteSection.isEmpty())
+            routeSections << newRouteSection;
+        else
+        {
+            QMessageBox msgBox; msgBox.setText(QString::fromUtf8("No Route found.")); msgBox.exec();
+        }
     }
     showRoute(routeSections);
 }
@@ -347,4 +371,53 @@ void MainWindow::showSpecialPOIs(bool show)
         poiList.clear();
         showPOIList(poiList);
     }
+}
+
+void MainWindow::changeRoutingOptionPage(int index)
+{
+    ui->stackedRoutingOptionWidget->setCurrentIndex(index);
+}
+
+void MainWindow::loadSettings()
+{
+    Settings* s = Settings::getInstance();
+    s->loadXML();
+    ui->txtAltitudePenalty->setValue(s->getPenalty_Altitude());
+    ui->txtCycleBarrier->setValue(s->getPenalty_Barrier_Cycle());
+    ui->txtCycleway_HighwayPath->setValue(s->getPenalty_Cycleway_HighwayPath());
+    ui->txtCycleway_HighwayPrimary->setValue(s->getPenalty_Cycleway_HighwayPrimary());
+    ui->txtCycleway_HighwaySecondary->setValue(s->getPenalty_Cycleway_HighwaySecondary());
+    ui->txtCycleway_HighwayTertiary->setValue(s->getPenalty_Cycleway_HighwayTertiary());
+    ui->txtHighwayTrafficlights->setValue(s->getPenalty_Highway_Trafficlights());
+    ui->txtNoCycleway->setValue(s->getPenalty_NoCycleway());
+    ui->txtNoCycleway_Dismount->setValue(s->getPenalty_NoCycleway_Dismount());
+    ui->txtNoCycleway_HighwayPath->setValue(s->getPenalty_NoCycleway_HighwayPath());
+    ui->txtNoCycleway_HighwayPrimary->setValue(s->getPenalty_NoCycleway_HighwayPrimary());
+    ui->txtNoCycleway_HighwaySecondary->setValue(s->getPenalty_NoCycleway_HighwaySecondary());
+    ui->txtNoCycleway_HighwayTertiary->setValue(s->getPenalty_NoCycleway_HighwayTertiary());
+    
+    QList<QPointF> view;
+    view.append(QPointF(s->getStandardPosition().getLon(), s->getStandardPosition().getLat()));
+    mapcontrol->setView(view);
+    mapcontrol->setZoom(s->getZoom());
+}
+void MainWindow::saveSettings()
+{
+    Settings* s = Settings::getInstance();
+    s->setPenalty_Altitude(ui->txtAltitudePenalty->value());
+    s->setPenalty_Barrier_Cycle(ui->txtCycleBarrier->value());
+    s->setPenalty_Cycleway_HighwayPath(ui->txtCycleway_HighwayPath->value());
+    s->setPenalty_Cycleway_HighwayPrimary(ui->txtCycleway_HighwayPrimary->value());
+    s->setPenalty_Cycleway_HighwaySecondary(ui->txtCycleway_HighwaySecondary->value());
+    s->setPenalty_Cycleway_HighwayTertiary(ui->txtCycleway_HighwayTertiary->value());
+    s->setPenalty_Highway_Trafficlights(ui->txtHighwayTrafficlights->value());
+    s->setPenalty_NoCycleway(ui->txtNoCycleway->value());
+    s->setPenalty_NoCycleway_Dismount(ui->txtNoCycleway_Dismount->value());
+    s->setPenalty_NoCycleway_HighwayPath(ui->txtNoCycleway_HighwayPath->value());
+    s->setPenalty_NoCycleway_HighwayPrimary(ui->txtNoCycleway_HighwayPrimary->value());
+    s->setPenalty_NoCycleway_HighwaySecondary(ui->txtNoCycleway_HighwaySecondary->value());
+    s->setPenalty_NoCycleway_HighwayTertiary(ui->txtNoCycleway_HighwayTertiary->value());
+    s->setStandardPosition(GPSPosition(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y()));
+    s->setZoom(mapcontrol->currentZoom());
+    s->saveXML();
 }

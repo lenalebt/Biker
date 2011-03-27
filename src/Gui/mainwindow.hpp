@@ -41,6 +41,8 @@ private:
     QList<boost::shared_ptr<OSMNode> > poiList;
     
     void calcRouteSection();
+    void loadSettings();
+    void saveSettings();
     
     
 public slots:
@@ -55,6 +57,7 @@ public slots:
     void removeLastWaypoint();
     void showCampingPOIs(bool show);
     void showSpecialPOIs(bool show);
+    void changeRoutingOptionPage(int index);
 };
 
 #endif // MAINWINDOW_HPP
