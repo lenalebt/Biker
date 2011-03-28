@@ -40,7 +40,7 @@ private:
     QList<GPSRoute> routeSections;
     QList<boost::shared_ptr<OSMNode> > poiList;
     
-    void calcRouteSection();
+    GPSRoute calcRouteSection(GPSPosition start, GPSPosition end);
     void loadSettings();
     void saveSettings();
     
@@ -59,6 +59,7 @@ public slots:
     void showSpecialPOIs(bool show);
     void changeRoutingOptionPage(int index);
     void showElevationProfile();
+    void recalculateRoute();
 };
 
 #endif // MAINWINDOW_HPP

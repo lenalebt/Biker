@@ -179,7 +179,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>40</y>
+          <y>80</y>
           <width>221</width>
           <height>25</height>
          </rect>
@@ -209,7 +209,7 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>20</y>
+          <y>60</y>
           <width>111</width>
           <height>16</height>
          </rect>
@@ -222,9 +222,9 @@
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>70</y>
+          <y>110</y>
           <width>221</width>
-          <height>471</height>
+          <height>421</height>
          </rect>
         </property>
         <property name="currentIndex">
@@ -237,7 +237,7 @@
             <x>0</x>
             <y>0</y>
             <width>211</width>
-            <height>461</height>
+            <height>421</height>
            </rect>
           </property>
           <property name="currentIndex">
@@ -895,6 +895,19 @@
         </widget>
         <widget class="QWidget" name="page_4"/>
        </widget>
+       <widget class="QPushButton" name="butRecalculateRoute">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>30</y>
+          <width>221</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Route neu berechnen</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -924,6 +937,10 @@
     <addaction name="actionOpenRoute"/>
     <addaction name="actionSaveRoute"/>
     <addaction name="separator"/>
+    <addaction name="actionRecalculateRoute"/>
+    <addaction name="actionRemoveLastWaypoint"/>
+    <addaction name="actionResetRoute"/>
+    <addaction name="separator"/>
     <addaction name="actionShowElevationProfile"/>
    </widget>
    <widget class="QMenu" name="menuPOIs">
@@ -951,6 +968,9 @@
   <action name="actionOpen">
    <property name="text">
     <string>Open...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionSaveRoute">
@@ -982,6 +1002,33 @@
   <action name="actionShowElevationProfile">
    <property name="text">
     <string>Show Elevation profile...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionRecalculateRoute">
+   <property name="text">
+    <string>Recalculate</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionRemoveLastWaypoint">
+   <property name="text">
+    <string>Delete last waypoint</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionResetRoute">
+   <property name="text">
+    <string>Delete Route</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

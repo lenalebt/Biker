@@ -4,7 +4,7 @@
 #include <iostream>
 #include "src/Routing/astar.hpp"
 #include "src/Toolbox/Settings.hpp"
-#include "src/Gui/elevationprofilewidget.hpp"
+#include "src/Gui/elevationprofiledialog.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -47,12 +47,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionCamping, SIGNAL(toggled(bool)), this, SLOT(showCampingPOIs(bool)));
     connect(ui->actionShowSpecialPOI, SIGNAL(toggled(bool)), this, SLOT(showSpecialPOIs(bool)));
     connect(ui->actionShowElevationProfile, SIGNAL(triggered()), this, SLOT(showElevationProfile()));
+    connect(ui->actionRemoveLastWaypoint, SIGNAL(triggered()), this, SLOT(removeLastWaypoint()));
+    connect(ui->actionResetRoute, SIGNAL(triggered()), this, SLOT(resetRoute()));
+    connect(ui->actionRecalculateRoute, SIGNAL(triggered()), this, SLOT(recalculateRoute()));
     
     //Weiterschalten der Seitenleiste
     connect(ui->butChangeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
     connect(ui->butChangeOptionPageR_1, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
     connect(ui->butChangeOptionPageL_2, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
     connect(ui->butChangeOptionPageR_2, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
+    
+    //Button auf der Seitenleiste
+    connect(ui->butRecalculateRoute, SIGNAL(clicked()), this, SLOT(recalculateRoute()));
     
     //Kram auf Seite1
     connect(ui->butResetRoute, SIGNAL(clicked()), this, SLOT(resetRoute()));
@@ -108,7 +114,17 @@ void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF c
         if ((dbreader != 0) && !dragged && dbreader->isOpen())
         {
             waypointList << actPos;
-            calcRouteSection();
+            if (waypointList.size()>1)
+            {
+                GPSRoute route = calcRouteSection(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+                if (!route.isEmpty())
+                {
+                    routeSections << route;
+                }
+                else
+                    waypointList.removeLast();
+            }
+            showRoute(routeSections);
         }
     }
 }
@@ -250,9 +266,9 @@ void MainWindow::openRoute()
     showRoute(routeSections);
 }
 
-void MainWindow::calcRouteSection()
+GPSRoute MainWindow::calcRouteSection(GPSPosition start, GPSPosition end)
 {
-    if ((dbreader != 0) && waypointList.size()>1 && dbreader->isOpen())
+    if ((dbreader != 0) && dbreader->isOpen())
     {
         AStar* astar;
         if (ui->cmbRoutingMetric->currentIndex() == 0)
@@ -292,16 +308,18 @@ void MainWindow::calcRouteSection()
         {
             astar = new AStar(dbreader, new BikeMetric(dbreader, ui->txtAltitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
-        GPSRoute newRouteSection = astar->calcShortestRoute(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+        GPSRoute newRouteSection = astar->calcShortestRoute(start, end);
         delete astar;
         if (!newRouteSection.isEmpty())
-            routeSections << newRouteSection;
+            return newRouteSection;
         else
         {
             QMessageBox msgBox; msgBox.setText(QString::fromUtf8("No Route found.")); msgBox.exec();
+            return GPSRoute();
         }
     }
-    showRoute(routeSections);
+    else
+        return GPSRoute();
 }
 
 void MainWindow::removeLastWaypoint()
@@ -425,8 +443,16 @@ void MainWindow::saveSettings()
 }
 void MainWindow::showElevationProfile()
 {
-    ElevationProfileWidget widget(dbreader);
-    widget.resize(320,240);
-    widget.show();
-    qDebug() << "TODO: Show Window."
+    ElevationProfileDialog widget(dbreader, routeSections, this);
+    widget.exec();
+}
+
+void MainWindow::recalculateRoute()
+{
+    routeSections.clear();
+    for (int i=1; i<waypointList.size(); i++)
+    {
+        routeSections << calcRouteSection(waypointList[i-1], waypointList[i]);
+    }
+    showRoute(routeSections);
 }

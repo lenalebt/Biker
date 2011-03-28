@@ -1,6 +1,7 @@
 QT += xml \
     network
-INCLUDEPATH += /usr/include/ /usr/include/qwt5/
+INCLUDEPATH += /usr/include/ \
+    /usr/include/qwt5/
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip \
@@ -63,7 +64,7 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Gui/QMapControl/src/circlepoint.h \
     src/Gui/mainwindow.hpp \
     src/Toolbox/Settings.hpp \
-    src/Gui/elevationprofilewidget.hpp
+    src/Gui/elevationprofiledialog.hpp
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -109,6 +110,6 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Gui/QMapControl/src/circlepoint.cpp \
     src/Gui/mainwindow.cpp \
     src/Toolbox/Settings.cpp \
-    src/Gui/elevationprofilewidget.cpp
+    src/Gui/elevationprofiledialog.cpp
 FORMS += src/Gui/mainwindow.ui \
-    src/Gui/elevationprofilewidget.ui
+    src/Gui/elevationprofiledialog.ui
