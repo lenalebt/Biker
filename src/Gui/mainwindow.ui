@@ -112,7 +112,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
+          <y>200</y>
           <width>111</width>
           <height>16</height>
          </rect>
@@ -125,13 +125,39 @@
         <property name="geometry">
          <rect>
           <x>130</x>
-          <y>100</y>
+          <y>200</y>
           <width>81</width>
           <height>16</height>
          </rect>
         </property>
         <property name="text">
          <string>0 km</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="butReverseRoute">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>201</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Route umkehren</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="butRecalculateLastStage">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>130</y>
+          <width>201</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>letzte Etappe neu berechnen</string>
         </property>
        </widget>
       </widget>
@@ -938,6 +964,8 @@
     <addaction name="actionSaveRoute"/>
     <addaction name="separator"/>
     <addaction name="actionRecalculateRoute"/>
+    <addaction name="actionRecalculateLastStage"/>
+    <addaction name="actionReverseRoute"/>
     <addaction name="actionRemoveLastWaypoint"/>
     <addaction name="actionResetRoute"/>
     <addaction name="separator"/>
@@ -1029,6 +1057,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionReverseRoute">
+   <property name="text">
+    <string>Reverse Route</string>
+   </property>
+  </action>
+  <action name="actionRecalculateLastStage">
+   <property name="text">
+    <string>Recalculate last stage</string>
    </property>
   </action>
  </widget>

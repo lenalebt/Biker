@@ -60,6 +60,8 @@ public slots:
     void changeRoutingOptionPage(int index);
     void showElevationProfile();
     void recalculateRoute();
+    void recalculateLastStage();
+    void reverseRoute();
 };
 
 #endif // MAINWINDOW_HPP

@@ -50,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionRemoveLastWaypoint, SIGNAL(triggered()), this, SLOT(removeLastWaypoint()));
     connect(ui->actionResetRoute, SIGNAL(triggered()), this, SLOT(resetRoute()));
     connect(ui->actionRecalculateRoute, SIGNAL(triggered()), this, SLOT(recalculateRoute()));
+    connect(ui->actionReverseRoute, SIGNAL(triggered()), this, SLOT(reverseRoute()));
+    connect(ui->actionRecalculateLastStage, SIGNAL(triggered()), this, SLOT(recalculateLastStage()));
     
     //Weiterschalten der Seitenleiste
     connect(ui->butChangeOptionPageL_1, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
@@ -57,15 +59,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->butChangeOptionPageL_2, SIGNAL(clicked()), this, SLOT(changeOptionPageL()));
     connect(ui->butChangeOptionPageR_2, SIGNAL(clicked()), this, SLOT(changeOptionPageR()));
     
-    //Button auf der Seitenleiste
-    connect(ui->butRecalculateRoute, SIGNAL(clicked()), this, SLOT(recalculateRoute()));
     
     //Kram auf Seite1
     connect(ui->butResetRoute, SIGNAL(clicked()), this, SLOT(resetRoute()));
     connect(ui->butRemoveLastWaypoint, SIGNAL(clicked()), this, SLOT(removeLastWaypoint()));
+    connect(ui->butReverseRoute, SIGNAL(clicked()), this, SLOT(reverseRoute()));
+    connect(ui->butRecalculateLastStage, SIGNAL(clicked()), this, SLOT(recalculateLastStage()));
     
     //Kram auf Seite2
     connect(ui->cmbRoutingMetric, SIGNAL(currentIndexChanged(int)), this, SLOT(changeRoutingOptionPage(int)));
+    connect(ui->butRecalculateRoute, SIGNAL(clicked()), this, SLOT(recalculateRoute()));
     
     //Einstellungen laden
     loadSettings();
@@ -454,5 +457,20 @@ void MainWindow::recalculateRoute()
     {
         routeSections << calcRouteSection(waypointList[i-1], waypointList[i]);
     }
+    showRoute(routeSections);
+}
+
+void MainWindow::reverseRoute()
+{
+    QList<GPSPosition> revList;
+    while (!waypointList.isEmpty())
+        revList << waypointList.takeLast();
+    waypointList = revList;
+    recalculateRoute();
+}
+void MainWindow::recalculateLastStage()
+{
+    routeSections.removeLast();
+    routeSections << calcRouteSection(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
     showRoute(routeSections);
 }
