@@ -26,6 +26,13 @@
      </widget>
     </item>
     <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="MinimumExpanding">
@@ -301,7 +308,7 @@
              </rect>
             </property>
             <property name="maximum">
-             <number>1000</number>
+             <number>9999</number>
             </property>
             <property name="singleStep">
              <number>1</number>
@@ -352,7 +359,7 @@
              </rect>
             </property>
             <property name="maximum">
-             <number>2000</number>
+             <number>9999</number>
             </property>
             <property name="value">
              <number>60</number>
@@ -368,7 +375,7 @@
              </rect>
             </property>
             <property name="maximum">
-             <number>2000</number>
+             <number>9999</number>
             </property>
             <property name="value">
              <number>60</number>
@@ -473,7 +480,7 @@
              <string>highway_primary</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>30</number>
@@ -508,7 +515,7 @@
              <string>highway_secondary</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>20</number>
@@ -556,7 +563,7 @@
              <string>highway_tertiary</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>10</number>
@@ -604,7 +611,7 @@
              <string>cycleway=no, ...</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>10</number>
@@ -649,7 +656,7 @@
              <string>highway_path</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>20</number>
@@ -713,7 +720,7 @@
              <string>highway_path</string>
             </property>
             <property name="maximum">
-             <number>2000</number>
+             <number>9999</number>
             </property>
             <property name="value">
              <number>300</number>
@@ -750,7 +757,7 @@
              <string>highway_secondary</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>5</number>
@@ -801,7 +808,7 @@
              <string>highway_tertiary</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>0</number>
@@ -836,7 +843,7 @@
              <string>highway_primary</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>10</number>
@@ -910,7 +917,7 @@
              <string>highway_path</string>
             </property>
             <property name="maximum">
-             <number>300</number>
+             <number>999</number>
             </property>
             <property name="value">
              <number>10</number>
