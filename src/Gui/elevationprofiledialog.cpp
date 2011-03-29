@@ -23,13 +23,18 @@ ElevationProfileDialog::ElevationProfileDialog(OSMDatabaseReader *reader, QList<
     QwtArray<double> ydata;
     
     double routeLength = route.calcLength();
-    double height=0, oldHeight=-5000.0, heightDiff=0, ascent=0, descent=0;
+    double height=0, oldHeight=-5000.0, heightDiff=0, ascent=0, descent=0, minHeight=32000, maxHeight=-32000;
     
     for (int i=0; i<route.size(); i++)
     {
         xdata.append((routeLength - route.calcLengthStartingAtID(i))/1000.0);
         height = reader->getAltitude(route.getWaypoint(i).getLon(), route.getWaypoint(i).getLat());
         ydata.append(height);
+        
+        if (height < minHeight)
+            minHeight = height;
+        if (height > maxHeight)
+            maxHeight = height;
         
         heightDiff = ((oldHeight!=-5000.0) ? (height-oldHeight) : 0.0);
         ascent +=  (heightDiff > 0.0 ? heightDiff : 0.0);
@@ -41,6 +46,10 @@ ElevationProfileDialog::ElevationProfileDialog(OSMDatabaseReader *reader, QList<
     QLocale loc = QLocale(QLocale::C);
     ui->lblAscent->setText(loc.toString(ascent, 'f', 0) + " m");
     ui->lblDescent->setText(loc.toString(descent, 'f', 0) + " m");
+    ui->lblMinimum->setText(loc.toString(minHeight, 'f', 0) + " m");
+    ui->lblMaximum->setText(loc.toString(maxHeight, 'f', 0) + " m");
+    ui->lblHeightDifferenceMinMax->setText(loc.toString(maxHeight-minHeight, 'f', 0) + " m");
+    ui->lblDistance->setText(loc.toString(routeLength/1000.0, 'f', 2) + " km");
     curve->attach(ui->qwtPlot);
     ui->qwtPlot->replot();
     

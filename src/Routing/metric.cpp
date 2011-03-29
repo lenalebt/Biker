@@ -175,7 +175,7 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 		//erstmal nachsehen, obs irgendwie besonders positive Eigenschaften gibt (Radweg, ...)
 		for (QList<OSMProperty>::iterator it = propList.begin(); it < propList.end(); it++)
 		{
-			if (*it == OSMProperty("highway", "cycleway") || *it == OSMProperty("cycleway", "*") || *it == OSMProperty("bicycle", "yes"))
+			if (*it == OSMProperty("highway", "cycleway") || *it == OSMProperty("cycleway", "*") || *it == OSMProperty("bicycle", "yes") || *it == OSMProperty("bicycle", "designated")|| *it == OSMProperty("bicycle", "dismount"))
 				cycleway=true;	//Radweg vorhanden. Toll!
 		}
 		if (!cycleway)
@@ -272,14 +272,8 @@ boost::shared_ptr<OSMPropertyTree> BikeMetric::getAssociatedPropertyTree()
         propListA << OSMProperty("bicycle","yes");
 		propListA << OSMProperty("highway","steps");		//nur erlaubt unter hohen Kosten (schieben).
         propListA << OSMProperty("highway","pedestrian");	//nur erlaubt unter hohen Kosten (schieben).
-		boost::shared_ptr<OSMPropertyTree> propTreeA(OSMPropertyTree::convertToOrPropertyTree(propListA));
-		
-		//Fußgängerwege nur, wenn Räder zugelassen sind
-        OSMProperty highway_footway("highway","footway");
-        OSMProperty bicycle_yes("bicycle","yes");
-		boost::shared_ptr<OSMPropertyTree> propTreeB(new OSMPropertyTreeBinaryAndNode(new OSMPropertyTreePropertyNode(highway_footway), new OSMPropertyTreePropertyNode(bicycle_yes)));
-		
-		propTree = boost::shared_ptr<OSMPropertyTree>(new OSMPropertyTreeBinaryOrNode(propTreeA, propTreeB));
+        propListA << OSMProperty("highway","footway");      //nur erlaubt unter hohen Kosten (schieben).
+		propTree = (OSMPropertyTree::convertToOrPropertyTree(propListA));
 	}
 	return propTree;
 	//return new PropertyTreeNodeAlwaysTrue();
