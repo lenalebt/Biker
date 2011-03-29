@@ -1,0 +1,58 @@
+Biker tries to be a nice software for planning bike tours. It is 
+possible to use it without having a working internet connection, if 
+you downloaded some map data beforehand.
+
+Usage:
+~~~~~~
+First, you need to compile it:
+    
+    qmake
+    make
+
+You should now be able to start it, typing:
+
+    ./Biker
+
+If you have a working internet connection, it should start 
+downloading some map data. To be able to do routing, you need to 
+load some OSM data. You may use pure .osm files (you can get files 
+for some regions from "http://download.geofabrik.de/osm/"). Press 
+"Ctrl-O" to open an .osm-file (or choose File->Open). It might take 
+some time to load a file, and it uses a huge amount of RAM. Later 
+on, I want to improve this part.
+
+If you want to cut some parts out of a file (e.g. to speed up 
+loading and decrease RAM usage), you may use "osmosis" to do so.
+
+Planning a route should be pretty intuitive, except zooming: use a 
+right click to zoom in, and a click on your wheel (or both buttons) 
+to zoom out. This will be improved later on.
+
+It is possible to adjust some parts of the routing algorithm via the right panel.
+
+Please excuse the crappy i18n. Guess it? Later on, ....
+
+
+Dependencies:
+~~~~~~~~~~~~~
+Biker depends on:
+    - libqwt5
+    - libcurl
+    - libzzip
+
+and, of course, qt4.
+
+If you experience compile problems, try to install these libraries 
+(developer version). If you experience problems with libqwt5, adding 
+a link in /usr/lib and /usr/include might help:
+
+    ln -s /usr/lib/libqwt-qt4.so /usr/lib/libqwt.so
+    ln -s /usr/include/qwt-qt4 /usr/include/qwt5
+
+It might be necessary to change the names. You can also adjust the 
+name of the library in the .pro-file
+
+Thanks to:
+~~~~~~~~~~
+Kai Winter, who wrote QMapControl.
+Hermann Kraus, who wrote a tool for downloading and parsing the SRTM data.
