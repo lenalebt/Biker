@@ -1,0 +1,11 @@
+<ticketlist>
+  <ticket>
+      <title>Startpunkt suchen fürs Routing</title>
+      <openingDate>1301349600000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>MINOR_BUG</type>
+      <description>Beim Suchen nach einem STartpunkt soll er, wenn er keinen findet, in immer größeren Umkreisen suchen</description>
+      <comment></comment>
+  </ticket>
+</ticketlist>
