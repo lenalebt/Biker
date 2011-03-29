@@ -37,8 +37,17 @@ AStarRoutingNode::AStarRoutingNode(OSMNode parent, ID_Datatype predecessor_, flo
 GPSRoute AStar::calcShortestRoute(GPSPosition startPosition, GPSPosition endPosition)
 {
 	OSMNode startNode = calcStartEndNode(startPosition);
+    if (startNode.getID() == 0)
+        startNode = calcStartEndNode(startPosition, 200.0);
+    if (startNode.getID() == 0)
+        startNode = calcStartEndNode(startPosition, 1000.0);
+    
 	OSMNode endNode = calcStartEndNode(endPosition);
-	
+    if (endNode.getID() == 0)
+        endNode = calcStartEndNode(endPosition, 200.0);
+    if (endNode.getID() == 0)
+        endNode = calcStartEndNode(endPosition, 1000.0);
+    
 	AStarRoutingNode startRoutingNode = AStarRoutingNode(startNode, 0, 0.0, startNode.calcDistance(endNode));
 	
 	return calcShortestRoute(startRoutingNode, endNode);
@@ -46,7 +55,11 @@ GPSRoute AStar::calcShortestRoute(GPSPosition startPosition, GPSPosition endPosi
 GPSRoute AStar::calcShortestRoute(OSMNode startNode, GPSPosition endPosition)
 {
 	OSMNode endNode = calcStartEndNode(endPosition);
-	
+    if (endNode.getID() == 0)
+        endNode = calcStartEndNode(endPosition, 200.0);
+    if (endNode.getID() == 0)
+        endNode = calcStartEndNode(endPosition, 1000.0);
+    
 	AStarRoutingNode startRoutingNode = AStarRoutingNode(startNode, 0, 0.0, metric->calcCost(startNode, endNode));
 	
 	return calcShortestRoute(startRoutingNode, endNode);
@@ -54,7 +67,11 @@ GPSRoute AStar::calcShortestRoute(OSMNode startNode, GPSPosition endPosition)
 GPSRoute AStar::calcShortestRoute(GPSPosition startPosition, OSMNode endNode)
 {
 	OSMNode startNode = calcStartEndNode(startPosition);
-	
+    if (startNode.getID() == 0)
+        startNode = calcStartEndNode(startPosition, 200.0);
+    if (startNode.getID() == 0)
+        startNode = calcStartEndNode(startPosition, 1000.0);
+    
 	AStarRoutingNode startRoutingNode = AStarRoutingNode(startNode, 0, 0.0, metric->calcCost(startNode, endNode));
 	
 	return calcShortestRoute(startRoutingNode, endNode);

@@ -223,7 +223,7 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 						penalty += 50 + distance * 3;
 					}
 				}
-                else if (*it == OSMProperty("highway", "path"))
+                else if ((*it == OSMProperty("highway", "path")) || *it == OSMProperty("highway", "track"))
 					penalty += distance * penalty_NoCycleway_HighwayPath;	//20% Strafe für Feldwege und sowas
                 else if ((*it == OSMProperty("bicycle", "dismount")) || (*it == OSMProperty("highway", "pedestrian")))
 					penalty += distance * penalty_NoCycleway_Dismount;
@@ -241,9 +241,9 @@ double BikeMetric::calcCost(const OSMNode& startNode, const OSMNode& endNode, co
 				else if (*it == OSMProperty("highway", "tertiary"))
 					penalty += distance * penalty_Cycleway_HighwayTertiary;	//15% Strafe für kleinere Straßen
 				//else if (*it == OSMProperty("highway", "steps"))  //keine Treppen erlauben Fahrräder, und wenn ist das murks.
-                else if (*it == OSMProperty("highway", "path"))
+                else if ((*it == OSMProperty("highway", "path")) || *it == OSMProperty("highway", "track")) //TODO: highway=track anpassen
 					penalty += distance * penalty_Cycleway_HighwayPath;	//20% Strafe für Feldwege und sowas
-                else if (*it == OSMProperty("bicycle", "dismount"))
+                else if ((*it == OSMProperty("bicycle", "dismount")) || (*it == OSMProperty("highway", "footway")))//TODO: Fußwege anpassen
                     penalty += distance * penalty_NoCycleway_Dismount;  //fürs Absteigen gibts die gleiche Strafe wie ohne Radweg
 			}
         }
@@ -285,6 +285,7 @@ boost::shared_ptr<OSMPropertyTree> BikeMetric::getAssociatedPropertyTree()
 		propListA << OSMProperty("highway","living_street");
 		propListA << OSMProperty("highway","service");
 		propListA << OSMProperty("highway","path");
+        propListA << OSMProperty("highway","track");
         propListA << OSMProperty("cycleway","track");
         propListA << OSMProperty("cycleway","lane");
         propListA << OSMProperty("bicycle","yes");
