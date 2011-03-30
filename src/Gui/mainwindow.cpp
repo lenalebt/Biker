@@ -492,7 +492,10 @@ void MainWindow::reverseRoute()
 }
 void MainWindow::recalculateLastStage()
 {
-    routeSections.removeLast();
-    routeSections << calcRouteSection(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+    if (routeSections.size() != 0)
+    {
+        routeSections.removeLast();
+        routeSections << calcRouteSection(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
+    }
     showRoute(routeSections);
 }
