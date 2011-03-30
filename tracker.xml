@@ -2,10 +2,37 @@
   <ticket>
       <title>Startpunkt suchen fürs Routing</title>
       <openingDate>1301349600000</openingDate>
-      <closedDate></closedDate>
-      <status>OPEN</status>
+      <closedDate>1301436000000</closedDate>
+      <status>FIXED</status>
       <type>MINOR_BUG</type>
       <description>Beim Suchen nach einem STartpunkt soll er, wenn er keinen findet, in immer größeren Umkreisen suchen</description>
+      <comment></comment>
+  </ticket>
+  <ticket>
+      <title>Größe der Seitenleiste variabel machen</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>WISHLIST</type>
+      <description>Problem mit Schriftgrößen auf anderen Rechnern</description>
+      <comment></comment>
+  </ticket>
+  <ticket>
+      <title>Fahrradmetrik verbessern</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>NEEDED_FEATURE</type>
+      <description>Es fehlen noch immer ein paar Wegtypen, und ein paar werden noch falsch behandelt.</description>
+      <comment></comment>
+  </ticket>
+  <ticket>
+      <title>Fahrradmetrik: Schieben</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>NEEDED_FEATURE</type>
+      <description>Schieben wird falsch behandelt, zumindest wirkt es so, als könne man nirgendwo schieben.</description>
       <comment></comment>
   </ticket>
 </ticketlist>
