@@ -35,4 +35,40 @@
       <description>Schieben wird falsch behandelt, zumindest wirkt es so, als könne man nirgendwo schieben.</description>
       <comment></comment>
   </ticket>
+  <ticket>
+      <title>Klicken auf "Route neuberechnen" lässt das Programm abstürzen, wenn keine Route vorhanden ist</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>MINOR_BUG</type>
+      <description>Klicken auf "Route neuberechnen" lässt das Programm abstürzen, wenn keine Route vorhanden ist</description>
+      <comment></comment>
+  </ticket>
+  <ticket>
+      <title>Warnung beim Versuch, eine Route zu planen ohne geöffnete Datei</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>NEEDED_FEATURE</type>
+      <description>Warnung beim Versuch, eine Route zu planen ohne geöffnete Datei</description>
+      <comment></comment>
+  </ticket>
+  <ticket>
+      <title>Warnung beim Öffnen von OSM-Dateien, dass das Laden etwas dauert</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>UNKNOWN</type>
+      <description>Warnung beim Öffnen von OSM-Dateien, dass das Laden etwas dauert</description>
+      <comment></comment>
+  </ticket>
+  <ticket>
+      <title>GPS-Unterstützung</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>WISHLIST</type>
+      <description></description>
+      <comment></comment>
+  </ticket>
 </ticketlist>

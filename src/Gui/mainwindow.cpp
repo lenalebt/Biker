@@ -147,6 +147,10 @@ void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF c
             }
             showRoute(routeSections);
         }
+        else if (dbreader == 0 && !dragged)
+        {
+            QMessageBox msgBox; msgBox.setText(QString::fromUtf8("You need to open a database file to be able to set waypoints.")); msgBox.exec();
+        }
     }
 }
 void MainWindow::menuOpenClicked()
@@ -162,7 +166,7 @@ void MainWindow::menuOpenClicked()
         
         QMessageBox msgBox;
         msgBox.setText("Extended parsing?");
-        msgBox.setInformativeText("Extended parsing lets you show some more POIs, but it takes longer to load the data file.");
+        msgBox.setInformativeText("Extended parsing lets you show some more POIs, but it takes longer to load the data file.\n\n Loading OSM files takes some time.");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
         int ret = msgBox.exec();
