@@ -24,9 +24,10 @@ on, I want to improve this part.
 If you want to cut some parts out of a file (e.g. to speed up 
 loading and decrease RAM usage), you may use "osmosis" to do so.
 
-Planning a route should be pretty intuitive, except zooming: use a 
-right click to zoom in, and a click on your wheel (or both buttons) 
-to zoom out. This will be improved later on.
+Planning a route should be pretty intuitive (after having opened an 
+.osm file), except zooming: use a right click to zoom in, and a 
+click on your wheel (or both buttons) to zoom out. This will be 
+improved later on.
 
 It is possible to adjust some parts of the routing algorithm via the right panel.
 

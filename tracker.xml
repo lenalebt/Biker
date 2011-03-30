@@ -71,4 +71,13 @@
       <description></description>
       <comment></comment>
   </ticket>
+  <ticket>
+      <title>Schließen des Programms führt ab und an zu Abstürzen</title>
+      <openingDate>1301436000000</openingDate>
+      <closedDate></closedDate>
+      <status>OPEN</status>
+      <type>UNKNOWN</type>
+      <description>Schließen des Programms führt ab und an zu Abstürzen: Schuld sind die boost::flyweights, die sich über nicht entfernt Referenzen aufregen.</description>
+      <comment></comment>
+  </ticket>
 </ticketlist>
