@@ -38,8 +38,8 @@
   <ticket>
       <title>Klicken auf "Route neuberechnen" lässt das Programm abstürzen, wenn keine Route vorhanden ist</title>
       <openingDate>1301436000000</openingDate>
-      <closedDate></closedDate>
-      <status>OPEN</status>
+      <closedDate>1301484217892</closedDate>
+      <status>FIXED</status>
       <type>MINOR_BUG</type>
       <description>Klicken auf "Route neuberechnen" lässt das Programm abstürzen, wenn keine Route vorhanden ist</description>
       <comment></comment>
@@ -56,8 +56,8 @@
   <ticket>
       <title>Warnung beim Öffnen von OSM-Dateien, dass das Laden etwas dauert</title>
       <openingDate>1301436000000</openingDate>
-      <closedDate></closedDate>
-      <status>OPEN</status>
+      <closedDate>1301484223572</closedDate>
+      <status>FIXED</status>
       <type>UNKNOWN</type>
       <description>Warnung beim Öffnen von OSM-Dateien, dass das Laden etwas dauert</description>
       <comment></comment>
