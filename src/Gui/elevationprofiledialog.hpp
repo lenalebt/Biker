@@ -40,6 +40,8 @@ private:
     Ui::ElevationProfileDialog *ui;
     OSMDatabaseReader* dbreader;
     QList<GPSRoute> routes;
+public slots:
+    void showPositionInMap(QMouseEvent& a);
 };
 
 #endif // ELEVATIONPROFILEDIALOG_HPP

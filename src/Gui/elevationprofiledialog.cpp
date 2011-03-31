@@ -19,6 +19,7 @@
 #include "elevationprofiledialog.hpp"
 #include "ui_elevationprofiledialog.h"
 #include <qwt_plot_curve.h>
+#include <qwt_symbol.h>
 #include <QDebug>
 
 ElevationProfileDialog::ElevationProfileDialog(OSMDatabaseReader *reader, QList<GPSRoute> routes, QWidget *parent) :
@@ -37,6 +38,7 @@ ElevationProfileDialog::ElevationProfileDialog(OSMDatabaseReader *reader, QList<
         route.addRoute(*it);
     
     QwtPlotCurve* curve = new QwtPlotCurve("Route 1");
+    QwtPlotCurve* points = new QwtPlotCurve("Wegpunkte Route 1");
     QwtArray<double> xdata;
     QwtArray<double> ydata;
     
@@ -60,6 +62,26 @@ ElevationProfileDialog::ElevationProfileDialog(OSMDatabaseReader *reader, QList<
         oldHeight = height;
     }
     curve->setData(xdata, ydata);
+    curve->setRenderHint(QwtPlotItem::RenderAntialiased);
+    
+    double lengthUpToNow=0.0;
+    xdata.clear(); ydata.clear();
+    xdata.append(0.0);
+    ydata.append(reader->getAltitude(route.getWaypoint(0).getLon(), route.getWaypoint(0).getLat()));
+    for (QList<GPSRoute>::iterator it = routes.begin(); it < routes.end(); it++)
+    {
+        lengthUpToNow += it->calcLength()/1000.0;
+        xdata.append(lengthUpToNow);
+        ydata.append(reader->getAltitude(it->getWaypoint(it->size()-1).getLon(), it->getWaypoint(it->size()-1).getLat()));
+    }
+    points->setData(xdata, ydata);
+    points->setStyle(QwtPlotCurve::NoCurve);
+    QwtSymbol sym;
+    sym.setStyle(QwtSymbol::Ellipse);
+    sym.setPen(QColor(Qt::darkMagenta));
+    sym.setBrush(QColor(Qt::white));
+    sym.setSize(7);
+    points->setSymbol(sym);
     
     QLocale loc = QLocale(QLocale::C);
     ui->lblAscent->setText(loc.toString(ascent, 'f', 0) + " m");
@@ -69,7 +91,9 @@ ElevationProfileDialog::ElevationProfileDialog(OSMDatabaseReader *reader, QList<
     ui->lblHeightDifferenceMinMax->setText(loc.toString(maxHeight-minHeight, 'f', 0) + " m");
     ui->lblDistance->setText(loc.toString(routeLength/1000.0, 'f', 2) + " km");
     curve->attach(ui->qwtPlot);
+    points->attach(ui->qwtPlot);
     ui->qwtPlot->replot();
+    
     
 }
 
@@ -88,4 +112,9 @@ void ElevationProfileDialog::changeEvent(QEvent *e)
     default:
         break;
     }
+}
+
+void ElevationProfileDialog::showPositionInMap(QMouseEvent& a)
+{
+    
 }
