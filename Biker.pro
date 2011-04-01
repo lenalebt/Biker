@@ -64,7 +64,9 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Gui/QMapControl/src/circlepoint.h \
     src/Gui/mainwindow.hpp \
     src/Toolbox/Settings.hpp \
-    src/Gui/elevationprofiledialog.hpp
+    src/Gui/elevationprofiledialog.hpp \
+    src/Gui/QMapControl/src/oepnvkartemapadapter.h \
+    src/Gui/QMapControl/src/opencyclemapadapter.h
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -110,6 +112,8 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Gui/QMapControl/src/circlepoint.cpp \
     src/Gui/mainwindow.cpp \
     src/Toolbox/Settings.cpp \
-    src/Gui/elevationprofiledialog.cpp
+    src/Gui/elevationprofiledialog.cpp \
+    src/Gui/QMapControl/src/oepnvkartemapadapter.cpp \
+    src/Gui/QMapControl/src/opencyclemapadapter.cpp
 FORMS += src/Gui/mainwindow.ui \
     src/Gui/elevationprofiledialog.ui

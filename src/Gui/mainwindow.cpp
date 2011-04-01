@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // add Layer to the MapControl
     mapcontrol->addLayer(mainlayer);
-    mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles"));
+    mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/osmmapnik/"));
     
     mapcontrol->setMaximumSize(1680, 1050);
     mapcontrol->setZoom(11);
@@ -83,7 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->butRemoveLastWaypoint, SIGNAL(clicked()), this, SLOT(removeLastWaypoint()));
     connect(ui->butReverseRoute, SIGNAL(clicked()), this, SLOT(reverseRoute()));
     connect(ui->butRecalculateLastStage, SIGNAL(clicked()), this, SLOT(recalculateLastStage()));
-    
+    connect(ui->cmbMapType, SIGNAL(currentIndexChanged(int)), this, SLOT(changeMapAdapter(int)));
+
     //Kram auf Seite2
     connect(ui->cmbRoutingMetric, SIGNAL(currentIndexChanged(int)), this, SLOT(changeRoutingOptionPage(int)));
     connect(ui->butRecalculateRoute, SIGNAL(clicked()), this, SLOT(recalculateRoute()));
@@ -498,4 +499,53 @@ void MainWindow::recalculateLastStage()
         routeSections << calcRouteSection(waypointList[waypointList.size()-2], waypointList[waypointList.size()-1]);
     }
     showRoute(routeSections);
+}
+void MainWindow::changeMapAdapter(int index)
+{
+    qmapcontrol::MapAdapter* tmpadapter = mapadapter;
+
+    if (index == 0)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::OSMMapAdapter();
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/osmmapnik/"));
+    } else if (index == 1)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::OpenCycleMapAdapter();
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/opencyclemap/"));
+    } else if (index == 2)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::OEPNVKarteMapAdapter();
+    } else if (index == 3)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::GoogleMapAdapter();
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/oepnvkarte/"));
+    } else if (index == 4)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::GoogleSatMapAdapter();
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/googlesat/"));
+    }/* else if (index == 5)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::OSMMapAdapter();
+    } else if (index == 6)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::OSMMapAdapter();
+    } else if (index == 7)
+    {//OSM Mapnik
+        mapadapter = new qmapcontrol::OSMMapAdapter();
+    }*/
+
+    GPSPosition pos(mapcontrol->currentCoordinate().x(), mapcontrol->currentCoordinate().y());
+    int zoom(mapcontrol->currentZoom());
+
+    mainlayer->setMapAdapter(mapadapter);
+    /*TODO:
+        setting zoom is causing the widget to zoom in - step by step.
+        this is not okay! (known bug from qmapcontrol). this is a
+        bad hack (setting invisible) to speed things up.
+      */
+    mapcontrol->setVisible(false);
+    mapcontrol->setZoom(zoom);
+    mapcontrol->setView(QPointF(pos.getLon(), pos.getLat()));
+    mapcontrol->setVisible(true);
+    delete tmpadapter;
 }

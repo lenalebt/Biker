@@ -80,6 +80,7 @@ public slots:
     void recalculateRoute();
     void recalculateLastStage();
     void reverseRoute();
+    void changeMapAdapter(int index);
 };
 
 #endif // MAINWINDOW_HPP

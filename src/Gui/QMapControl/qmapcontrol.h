@@ -16,3 +16,6 @@
 #include "src/Gui/QMapControl/src/openaerialmapadapter.h"
 #include "src/Gui/QMapControl/src/fixedimageoverlay.h"
 #include "src/Gui/QMapControl/src/emptymapadapter.h"
+
+#include "src/Gui/QMapControl/src/oepnvkartemapadapter.h"
+#include "src/Gui/QMapControl/src/opencyclemapadapter.h"

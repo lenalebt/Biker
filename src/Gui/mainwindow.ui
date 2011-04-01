@@ -167,6 +167,49 @@
          <string>letzte Etappe neu berechnen</string>
         </property>
        </widget>
+       <widget class="QLabel" name="label_32">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>230</y>
+          <width>67</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Karte:</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="cmbMapType">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>250</y>
+          <width>211</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <item>
+         <property name="text">
+          <string>OpenStreetMap Mapnik</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>OpenCycleMap</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>ÖPNVKarte</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Google Maps</string>
+         </property>
+        </item>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_2">
        <widget class="QLabel" name="label_2">
@@ -952,7 +995,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
