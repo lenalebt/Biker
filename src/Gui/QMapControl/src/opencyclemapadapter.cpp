@@ -3,7 +3,7 @@
 namespace qmapcontrol
 {
     OpenCycleMapAdapter::OpenCycleMapAdapter()
-        : TileMapAdapter("tile.opencyclemap.org", "/%1/%2/%3.png", 256, 0, 17)
+        : TileMapAdapter("c.andy.sandbox.cloudmade.com", "/tiles/cycle/%1/%2/%3.png", 256, 0, 17)
     {   //TODO: evtl. falsche Adresse? Aus dem Kopf geraten...
     }
 
