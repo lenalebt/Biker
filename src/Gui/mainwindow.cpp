@@ -515,10 +515,11 @@ void MainWindow::changeMapAdapter(int index)
     } else if (index == 2)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::OEPNVKarteMapAdapter();
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/oepnvkarte/"));
     } else if (index == 3)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::GoogleMapAdapter();
-        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/oepnvkarte/"));
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/googlemap/"));
     } else if (index == 4)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::GoogleSatMapAdapter();
