@@ -582,5 +582,9 @@ void MainWindow::changeMapAdapter(int index)
     mapcontrol->setZoom(zoom);
     mapcontrol->setView(QPointF(pos.getLon(), pos.getLat()));
     mapcontrol->setVisible(true);
-    delete tmpadapter;
+    //delete poiLayer;
+    //delete routeLayer;
+    //delete tmpadapter;
+    showPOIList(poiList);
+    showRoute(routeSections);
 }
