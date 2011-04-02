@@ -995,7 +995,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -1003,6 +1003,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionOpenAndAdd"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -1117,6 +1118,14 @@
   <action name="actionRecalculateLastStage">
    <property name="text">
     <string>Recalculate last stage</string>
+   </property>
+  </action>
+  <action name="actionOpenAndAdd">
+   <property name="text">
+    <string>Open and add...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
  </widget>

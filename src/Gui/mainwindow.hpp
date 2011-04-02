@@ -66,6 +66,7 @@ private:
 public slots:
     void mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF coordinate );
     void menuOpenClicked();
+    void menuOpenAndAddClicked();
     void menuCloseClicked();
     void changeOptionPageL();
     void changeOptionPageR();

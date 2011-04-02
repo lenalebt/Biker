@@ -126,8 +126,17 @@ boost::shared_ptr<OSMNode>  OSMInMemoryDatabase::getNode(ID_Datatype id)
 bool OSMInMemoryDatabase::openDatabase(QString filename)
 {
     OSMParser<true, true, false> parser(*this);
+    edgeMap.clear();
+    nodeMap.clear();
+    nodePlaceMap.clear();
     return (dbOpen=parser.parse(filename));
 }
+bool OSMInMemoryDatabase::addDatabase(QString filename)
+{
+    OSMParser<true, true, false> parser(*this);
+    return (dbOpen=parser.parse(filename));
+}
+
 bool OSMInMemoryDatabase::isOpen() {return dbOpen;}
 void OSMInMemoryDatabase::closeDatabase()
 {
@@ -266,5 +275,10 @@ void OSMInMemoryDatabase::finished()
 bool OSMInMemoryDatabase::openDatabase(QString filename, bool extendedParsing)
 {
     this->extendedParsing = extendedParsing;
-    return openDatabase(filename);
+    return this->openDatabase(filename);
+}
+bool OSMInMemoryDatabase::addDatabase(QString filename, bool extendedParsing)
+{
+    this->extendedParsing = extendedParsing;
+    return this->addDatabase(filename);
 }

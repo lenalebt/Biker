@@ -66,6 +66,7 @@ public:
     virtual QList<boost::shared_ptr<OSMWay> > getWays(const GPSPosition& searchMidPoint, double radius, OSMPropertyTree& props)=0;
 
     virtual bool openDatabase(QString filename)=0;
+    virtual bool addDatabase(QString filename)=0;
     virtual bool isOpen()=0;
     virtual void closeDatabase()=0;
 
@@ -95,6 +96,8 @@ public:
 	
 	bool openDatabase(QString filename);
     bool openDatabase(QString filename, bool extendedParsing);
+    bool addDatabase(QString filename);
+    bool addDatabase(QString filename, bool extendedParsing);
 	bool isOpen();
 	void closeDatabase();
     

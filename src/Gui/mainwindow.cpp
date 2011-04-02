@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //Menü
     connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(menuCloseClicked()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(menuOpenClicked()));
+    connect(ui->actionOpenAndAdd, SIGNAL(triggered()), this, SLOT(menuOpenAndAddClicked()));
     connect(ui->actionOpenRoute, SIGNAL(triggered()), this, SLOT(openRoute()));
     connect(ui->actionSaveRoute, SIGNAL(triggered()), this, SLOT(saveRoute()));
     connect(ui->actionCamping, SIGNAL(toggled(bool)), this, SLOT(showCampingPOIs(bool)));
@@ -179,7 +180,40 @@ void MainWindow::menuOpenClicked()
         if (ret == QMessageBox::Yes)
             success = ((OSMInMemoryDatabase*)dbreader)->openDatabase(filename, true);
         else
-            success = dbreader->openDatabase(filename);
+            success = ((OSMInMemoryDatabase*)dbreader)->openDatabase(filename, false);
+        if (!success)
+        {
+            setWindowTitle("Biker");
+            QMessageBox msgBox; msgBox.setText(QString::fromUtf8("Error while loading database.")); msgBox.exec();
+            delete dbreader;
+        }
+        else
+        {
+            setWindowTitle(QString("Biker - ") + filename);
+        }
+    }
+}
+void MainWindow::menuOpenAndAddClicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen/hinzufügen"), "", "*.osm");
+    if (filename.endsWith(".osm"))
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Extended parsing?");
+        msgBox.setInformativeText("Extended parsing lets you show some more POIs, but it takes longer to load the data file.\n\n Loading OSM files takes some time.");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
+        
+        setWindowTitle("Biker - loading...");
+        
+        if (dbreader == 0)
+            dbreader = new OSMInMemoryDatabase();
+        bool success = false;
+        if (ret == QMessageBox::Yes)
+            success = ((OSMInMemoryDatabase*)dbreader)->addDatabase(filename, true);
+        else
+            success = ((OSMInMemoryDatabase*)dbreader)->addDatabase(filename, false);
         if (!success)
         {
             setWindowTitle("Biker");

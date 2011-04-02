@@ -114,7 +114,3 @@ void ElevationProfileDialog::changeEvent(QEvent *e)
     }
 }
 
-void ElevationProfileDialog::showPositionInMap(QMouseEvent& a)
-{
-    
-}
