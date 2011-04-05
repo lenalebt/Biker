@@ -45,7 +45,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // add Layer to the MapControl
     mapcontrol->addLayer(mainlayer);
+#ifdef WINDOWS
+    //TODO: Pfade anpassen!
+    mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/osmmapnik/"));
+#else
     mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/osmmapnik/"));
+#endif
     
     mapcontrol->setMaximumSize(1680, 1050);
     mapcontrol->setZoom(11);
@@ -541,23 +546,43 @@ void MainWindow::changeMapAdapter(int index)
     if (index == 0)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::OSMMapAdapter();
+#ifdef WINDOWS
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/osmmapnik/"));
+#else
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/osmmapnik/"));
+#else
     } else if (index == 1)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::OpenCycleMapAdapter();
+#ifdef WINDOWS
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/opencyclemap/"));
+#else
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/opencyclemap/"));
+#endif
     } else if (index == 2)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::OEPNVKarteMapAdapter();
+#ifdef WINDOWS
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/oepnvkarte/"));
+#else
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/oepnvkarte/"));
+#endif
     } else if (index == 3)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::GoogleMapAdapter();
+#ifdef WINDOWS
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/googlemap/"));
+#else
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/googlemap/"));
+#endif
     } else if (index == 4)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::GoogleSatMapAdapter();
+#ifdef WINDOWS
+        mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/googlesat/"));
+#else
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/googlesat/"));
+#endif
     }/* else if (index == 5)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::OSMMapAdapter();
