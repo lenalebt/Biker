@@ -18,6 +18,7 @@
 
 #include "osmdatabase.hpp"
 #include "src/Database/Parser/osmparser.hpp"
+#include "src/Database/Parser/pbfparser.hpp"
 
 OSMDatabaseReader::OSMDatabaseReader()
 {
@@ -130,16 +131,39 @@ boost::shared_ptr<OSMNode>  OSMInMemoryDatabase::getNode(ID_Datatype id)
 
 bool OSMInMemoryDatabase::openDatabase(QString filename)
 {
-    OSMParser<true, true, false> parser(*this);
-    edgeMap.clear();
-    nodeMap.clear();
-    nodePlaceMap.clear();
-    return (dbOpen=parser.parse(filename));
+    if (filename.endsWith(".osm"))
+    {
+        OSMParser<true, true, false> parser(*this);
+        edgeMap.clear();
+        nodeMap.clear();
+        nodePlaceMap.clear();
+        return (dbOpen=parser.parse(filename));
+    }
+    else if (filename.endsWith(".pbf"))
+    {
+        PBFParser<true, true, false> parser(*this);
+        edgeMap.clear();
+        nodeMap.clear();
+        nodePlaceMap.clear();
+        return (dbOpen=parser.parse(filename));
+    }
+    else
+        return false;
 }
 bool OSMInMemoryDatabase::addDatabase(QString filename)
 {
-    OSMParser<true, true, false> parser(*this);
-    return (dbOpen=parser.parse(filename));
+    if (filename.endsWith(".osm"))
+    {
+        OSMParser<true, true, false> parser(*this);
+        return (dbOpen=parser.parse(filename));
+    }
+    else if (filename.endsWith(".pbf"))
+    {
+        PBFParser<true, true, false> parser(*this);
+        return (dbOpen=parser.parse(filename));
+    }
+    else
+        return false;
 }
 
 bool OSMInMemoryDatabase::isOpen() {return dbOpen;}

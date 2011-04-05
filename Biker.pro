@@ -10,8 +10,8 @@ OBJECTS_DIR = obj
 MOC_DIR = obj
 UI_DIR = obj
 RCC_DIR = obj
-# DESTDIR = bin
 
+# DESTDIR = bin
 profiling { 
     QMAKE_CFLAGS += -pg
     QMAKE_CXXFLAGS += -pg
@@ -66,7 +66,8 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Toolbox/Settings.hpp \
     src/Gui/elevationprofiledialog.hpp \
     src/Gui/QMapControl/src/oepnvkartemapadapter.h \
-    src/Gui/QMapControl/src/opencyclemapadapter.h
+    src/Gui/QMapControl/src/opencyclemapadapter.h \
+    src/Database/Parser/pbfparser.hpp
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -114,6 +115,7 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Toolbox/Settings.cpp \
     src/Gui/elevationprofiledialog.cpp \
     src/Gui/QMapControl/src/oepnvkartemapadapter.cpp \
-    src/Gui/QMapControl/src/opencyclemapadapter.cpp
+    src/Gui/QMapControl/src/opencyclemapadapter.cpp \
+    src/Database/Parser/pbfparser.cpp
 FORMS += src/Gui/mainwindow.ui \
     src/Gui/elevationprofiledialog.ui
