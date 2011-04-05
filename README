@@ -40,6 +40,7 @@ Biker depends on:
     - libqwt5
     - libcurl
     - libzzip
+    - libprotobuf
 
 and, of course, qt4.
 

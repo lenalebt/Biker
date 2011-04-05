@@ -5,7 +5,8 @@ INCLUDEPATH += /usr/include/ \
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip \
-    -lqwt
+    -lqwt \
+    -lprotobuf
 OBJECTS_DIR = obj
 MOC_DIR = obj
 UI_DIR = obj

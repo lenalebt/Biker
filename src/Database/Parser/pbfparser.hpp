@@ -23,6 +23,12 @@
 #include "src/Database/osmdatabasewriter.hpp"
 #include "src/Database/Parser/pbf/osmformat.pb.h"
 
+/* Sometimes, you need to rebuild osmformat.pb.h and osmformat.pb.cc
+   To do so, type
+         protoc osmformat.proto --cpp_out=.
+   from src/Database/Parser/pbf/ .
+ */
+
 template <bool parseNodes, bool parseWays, bool parseRelations>
 class PBFParser
 {
