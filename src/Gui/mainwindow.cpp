@@ -163,7 +163,7 @@ void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF c
 void MainWindow::menuOpenClicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen"), "", "*.osm");
-    if (filename.endsWith(".osm"))
+    if (filename.endsWith(".osm") || filename.endsWith(".pbf"))
     {
         if (dbreader != 0)
         {
@@ -201,7 +201,7 @@ void MainWindow::menuOpenClicked()
 void MainWindow::menuOpenAndAddClicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen/hinzufügen"), "", "*.osm");
-    if (filename.endsWith(".osm"))
+    if (filename.endsWith(".osm") || filename.endsWith(".pbf"))
     {
         QMessageBox msgBox;
         msgBox.setText("Extended parsing?");
@@ -550,7 +550,7 @@ void MainWindow::changeMapAdapter(int index)
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/biker/data/tiles/osmmapnik/"));
 #else
         mapcontrol->enablePersistentCache(QDir(QDir::homePath() + "/.biker/data/tiles/osmmapnik/"));
-#else
+#endif
     } else if (index == 1)
     {//OSM Mapnik
         mapadapter = new qmapcontrol::OpenCycleMapAdapter();
