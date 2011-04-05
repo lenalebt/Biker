@@ -67,7 +67,9 @@ HEADERS += src/Database/osmdatabase.hpp \
     src/Gui/elevationprofiledialog.hpp \
     src/Gui/QMapControl/src/oepnvkartemapadapter.h \
     src/Gui/QMapControl/src/opencyclemapadapter.h \
-    src/Database/Parser/pbfparser.hpp
+    src/Database/Parser/pbfparser.hpp \
+    src/Database/Parser/pbf/osmformat.pb.h \
+    src/Database/Parser/pbf/fileformat.pb.h
 SOURCES += src/Database/osmdatabase.cpp \
     src/DataPrimitives/osmproperty.cpp \
     src/main.cpp \
@@ -116,6 +118,10 @@ SOURCES += src/Database/osmdatabase.cpp \
     src/Gui/elevationprofiledialog.cpp \
     src/Gui/QMapControl/src/oepnvkartemapadapter.cpp \
     src/Gui/QMapControl/src/opencyclemapadapter.cpp \
-    src/Database/Parser/pbfparser.cpp
+    src/Database/Parser/pbfparser.cpp \
+    src/Database/Parser/pbf/osmformat.pb.cc \
+    src/Database/Parser/pbf/fileformat.pb.cc
 FORMS += src/Gui/mainwindow.ui \
     src/Gui/elevationprofiledialog.ui
+OTHER_FILES += src/Database/Parser/pbf/osmformat.proto \
+    src/Database/Parser/pbf/fileformat.proto

@@ -21,6 +21,7 @@
 
 #include "src/DataPrimitives/DataPrimitives.hpp"
 #include "src/Database/osmdatabasewriter.hpp"
+#include "src/Database/Parser/pbf/osmformat.pb.h"
 
 template <bool parseNodes, bool parseWays, bool parseRelations>
 class PBFParser
