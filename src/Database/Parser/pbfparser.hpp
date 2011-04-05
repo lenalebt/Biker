@@ -22,6 +22,19 @@
 #include "src/DataPrimitives/DataPrimitives.hpp"
 #include "src/Database/osmdatabasewriter.hpp"
 #include "src/Database/Parser/pbf/osmformat.pb.h"
+#include "src/Database/Parser/pbf/fileformat.pb.h"
+#include <zlib.h>
+// #include <bzlib.h>
+#include <QHash>
+#include <QString>
+#include <QFile>
+#include <QDebug>
+#include <QStringList>
+
+#define NANO ( 1000.0 * 1000.0 * 1000.0 )
+#define MAX_BLOCK_HEADER_SIZE ( 64 * 1024 )
+#define MAX_BLOB_SIZE ( 32 * 1024 * 1024 )
+
 
 /* Sometimes, you need to rebuild osmformat.pb.h and osmformat.pb.cc
    To do so, type
@@ -29,7 +42,6 @@
    from src/Database/Parser/pbf/ .
  */
 
-template <bool parseNodes, bool parseWays, bool parseRelations>
 class PBFParser
 {
 private:
@@ -43,7 +55,91 @@ private:
     int nodeCount;
     int wayCount;
     int relationCount;
+    
+    
+	enum Mode {
+		ModeNode, ModeWay, ModeRelation, ModeDense
+	};
+    enum EntityType {
+        EntityNone, EntityNode, EntityWay, EntityRelation
+    };
+	int convertNetworkByteOrder( char data[4] );
+    
+    
+    OSMPBF::BlobHeader m_blockHeader;
+    OSMPBF::Blob m_blob;
 
+    OSMPBF::HeaderBlock m_headerBlock;
+    OSMPBF::PrimitiveBlock m_primitiveBlock;
+
+    int m_currentGroup;
+    int m_currentEntity;
+    bool m_loadBlock;
+
+    Mode m_mode;
+
+    QHash< QString, int > m_nodeTags;
+    QHash< QString, int > m_wayTags;
+    QHash< QString, int > m_relationTags;
+
+    long long m_lastDenseID;
+    long long m_lastDenseLatitude;
+    long long m_lastDenseLongitude;
+    int m_lastDenseTag;
+
+    QFile m_file;
+    QByteArray m_buffer;
+    QByteArray m_bzip2Buffer;
+    
+    struct Tag {
+        QString key;
+        QString value;
+    };
+
+    struct Node {
+        unsigned id;
+        GPSPosition coordinate;
+        std::vector< Tag > tags;
+    };
+
+    struct Way {
+        unsigned id;
+        std::vector< unsigned > nodes;
+        std::vector< Tag > tags;
+    };
+
+    struct RelationMember {
+        unsigned ref;
+        enum Type {
+            Way, Node, Relation
+        } type;
+        QString role;
+    };
+
+    struct Relation {
+        unsigned id;
+        std::vector< RelationMember > members;
+        std::vector< Tag > tags;
+    };
+    
+	void setNodeTags( QStringList tags );
+	void setWayTags( QStringList tags );
+	void setRelationTags( QStringList tags );
+	EntityType getEntitiy( Node* node, Way* way, Relation* relation );
+	void parseNode( Node* node );
+	void parseWay( Way* way );
+	void parseRelation( Relation* relation );
+	void parseDense( Node* node );
+	void loadGroup();
+	void loadBlock();
+	bool readNextBlock();
+	bool readBlockHeader();
+	bool readBlob();
+	bool unpackZlib();
+	//bool unpackBzip2();
+	static void *SzAlloc( void *p, size_t size);
+	static void SzFree( void *p, void *address);
+    
 public:
     PBFParser( OSMDatabaseWriter& dbWriter );
     ~PBFParser();
@@ -51,5 +147,13 @@ public:
     bool parse(QString filename);
 };
 
+static inline bool openQFile( QFile* file, QIODevice::OpenMode mode )
+{
+	if ( !file->open( mode ) ) {
+		qCritical() << "could not open file:" << file->fileName() << "," << mode;
+		return false;
+	}
+	return true;
+}
 
 #endif // PBFPARSER_HPP

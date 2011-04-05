@@ -162,7 +162,7 @@ void MainWindow::mouseEventCoordinate ( const QMouseEvent* evnt, const QPointF c
 }
 void MainWindow::menuOpenClicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen"), "", "*.osm");
+    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen"), "", "*.osm *.osm.pbf");
     if (filename.endsWith(".osm") || filename.endsWith(".pbf"))
     {
         if (dbreader != 0)
@@ -200,7 +200,7 @@ void MainWindow::menuOpenClicked()
 }
 void MainWindow::menuOpenAndAddClicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen/hinzufügen"), "", "*.osm");
+    QString filename = QFileDialog::getOpenFileName(this, QString::fromUtf8("Datenbank öffnen/hinzufügen"), "", "*.osm *.osm.pbf");
     if (filename.endsWith(".osm") || filename.endsWith(".pbf"))
     {
         QMessageBox msgBox;

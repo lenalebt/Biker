@@ -141,7 +141,7 @@ bool OSMInMemoryDatabase::openDatabase(QString filename)
     }
     else if (filename.endsWith(".pbf"))
     {
-        PBFParser<true, true, false> parser(*this);
+        PBFParser parser(*this);
         edgeMap.clear();
         nodeMap.clear();
         nodePlaceMap.clear();
@@ -159,7 +159,7 @@ bool OSMInMemoryDatabase::addDatabase(QString filename)
     }
     else if (filename.endsWith(".pbf"))
     {
-        PBFParser<true, true, false> parser(*this);
+        PBFParser parser(*this);
         return (dbOpen=parser.parse(filename));
     }
     else
