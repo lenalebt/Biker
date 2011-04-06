@@ -108,7 +108,10 @@ GPSRoute AStar::calcShortestRoute(AStarRoutingNode startNode, OSMNode endNode)
 			{
 				boost::shared_ptr<OSMNode> actEdgeEndNode = db->getNode((*it)->getEndNodeID());
 				
-				if (!openlist->contains(actEdgeEndNode->getID()))
+                if (actEdgeEndNode.get() == 0)
+                    continue;   //WORKAROUND
+				
+                if (!openlist->contains(actEdgeEndNode->getID()))
 				{
 					boost::shared_ptr<AStarRoutingNode> actEdgeRoutingEndNode(new AStarRoutingNode(*actEdgeEndNode, actNode->getID(), actNode->getOverallCost() + metric->calcCost(*actNode, *actEdgeEndNode, **it), metric->calcCost(*actEdgeEndNode, endNode)));
 					if (actEdgeRoutingEndNode.get() == 0)
