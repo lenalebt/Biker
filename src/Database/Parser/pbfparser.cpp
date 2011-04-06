@@ -73,12 +73,12 @@ bool PBFParser::parse(QString filename)
     
     
     //TODO: Parsen... im detail...
-    Way inputWay;
+    OSMWay* inputWay = new OSMWay(0, QList<OSMProperty>());
     OSMNode* inputNode = new OSMNode(0, GPSPosition(), QList<OSMProperty>());
     Relation inputRelation;
     while ( true )
     {
-        EntityType type = getEntitiy( inputNode, &inputWay, &inputRelation );
+        EntityType type = getEntitiy( inputNode, inputWay, &inputRelation );
 
         if ( type == EntityNone )
             break;
@@ -93,19 +93,9 @@ bool PBFParser::parse(QString filename)
         }
 
         if ( type == EntityWay ) {
-            OSMWay* way = new OSMWay(inputWay.id, QList<OSMProperty>());
             
-            for (unsigned int i=0; i<inputWay.nodes.size(); i++)
-            {
-                way->addMember(inputWay.nodes[i]);
-            }
-            
-            for (unsigned int i=0; i<inputWay.tags.size(); i++)
-            {
-                way->addProperty(OSMProperty(inputWay.tags[i].key, inputWay.tags[i].value));
-            }
-            
-            dbWriter.addWay(way);
+            dbWriter.addWay(inputWay);
+            inputWay = new OSMWay(0, QList<OSMProperty>());
 
             continue;
         }
@@ -118,7 +108,7 @@ bool PBFParser::parse(QString filename)
 }
 
 
-PBFParser::EntityType PBFParser::getEntitiy( OSMNode* node, Way* way, Relation* relation )
+PBFParser::EntityType PBFParser::getEntitiy( OSMNode* node, OSMWay* way, Relation* relation )
 {
     if ( m_loadBlock ) {
         if ( !readNextBlock() )
@@ -178,24 +168,21 @@ void PBFParser::parseNode( OSMNode* node )
 }
 
 
-void PBFParser::parseWay( Way* way )
+void PBFParser::parseWay( OSMWay* way )
 {
-    way->tags.clear();
-    way->nodes.clear();
-
     const OSMPBF::Way& inputWay = m_primitiveBlock.primitivegroup( m_currentGroup ).ways( m_currentEntity );
-    way->id = inputWay.id();
+    way->setID(inputWay.id());
     for ( int tag = 0; tag < inputWay.keys_size(); tag++ ) {
-        Tag newTag;
-        newTag.key = QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.keys( tag ) ).data() );
-        newTag.value = QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.vals( tag ) ).data() );
-        way->tags.push_back( newTag );
+        OSMProperty newTag;
+        newTag.setKey(QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.keys( tag ) ).data() ));
+        newTag.setValue(QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.vals( tag ) ).data() ));
+        way->addProperty(newTag);
     }
 
     long long lastRef = 0;
     for ( int i = 0; i < inputWay.refs_size(); i++ ) {
         lastRef += inputWay.refs( i );
-        way->nodes.push_back( lastRef );
+        way->addMember(lastRef);
     }
 
     m_currentEntity++;

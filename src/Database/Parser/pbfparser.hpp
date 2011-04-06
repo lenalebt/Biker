@@ -122,9 +122,9 @@ private:
         std::vector< Tag > tags;
     };
     
-        EntityType getEntitiy( OSMNode* node, Way* way, Relation* relation );
+        EntityType getEntitiy( OSMNode* node, OSMWay* way, Relation* relation );
         void parseNode( OSMNode* node );
-	void parseWay( Way* way );
+        void parseWay( OSMWay* way );
 	void parseRelation( Relation* relation );
         void parseDense( OSMNode* node );
 	void loadGroup();
