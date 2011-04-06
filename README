@@ -6,6 +6,7 @@ Usage:
 ~~~~~~
 First, you need to compile it:
     
+    protoc --cpp_out=. src/Database/Parser/pbf/{osm,file}format.proto
     qmake
     make
 
@@ -54,7 +55,49 @@ a link in /usr/lib and /usr/include might help:
 It might be necessary to change the names. You can also adjust the 
 name of the library in the .pro-file
 
+Known Bugs and shortcomings:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-Biker crashes when changing the map type after having planned a 
+route. This is due to QMapControl was not made to change the base 
+map layer after it has been created (or I am unable to use it 
+correctly ;D).
+
+-It needs some time to change between two map layers. This is due to 
+zooming with QMapControl to a specific detail level makes it zoom 
+through all levels above. I think it is not possible to change this 
+behaviour without changing some implementation detail of 
+QMapControl. It did not bother that much ;).
+
+-Biker uses tons of RAM. This is not due to someone elses work ;D. 
+Since I did not have the time to write a better database backend up 
+to now, at every startup we need to parse an osm file (XML or PBF) 
+and hold everything from there in RAM. If someone is willing to 
+change that, have a look at Database/osmdatabase.hpp and 
+Database/osmdatabasewriter.hpp .
+
+-Biker is not that fast on routing as you might expect. This is due 
+to, guess it, the routing algorithm used. I use AStar because it is 
+easy to modify the cost function without the need to change anything 
+else. Being able to change the cost function, especially to avoid 
+hills was a design goal of the program.
+There are some other, faster algorithms where you need to precompute 
+parts of the graph, but you are not free to change the weights later 
+on (if I got it right, which might not be the case). In Every case, 
+it is more work to implement it. Examples are "Highway Hierarchies" 
+and its successors.
+If you want to implement your own routing algorithm, have a look at 
+Routing/routing.hpp , Routing/metric.hpp and Routing/astar.hpp . You 
+will also find an implementation of Dijkstras algorithm in 
+Routing/dijkstra.hpp .
+
+-Using qmake as build toolchain isn't that nice. I was thinking 
+about changing to cmake later on, but did not use use that tool up 
+to now and did not have the time to get used to it. Manually 
+creating some header from .proto files is not okay, too.
+
 Thanks to:
 ~~~~~~~~~~
 Kai Winter, who wrote QMapControl.
-Hermann Kraus, who wrote a tool for downloading and parsing the SRTM data.
+Hermann Kraus, who wrote a tool for downloading and parsing SRTM data.
+Christian Vetter, who wrote MoNav and made it possible for me to parse .osm.pbf files.

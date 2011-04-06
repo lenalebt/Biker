@@ -16,9 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */ 
 
-/* Uses code from MoNav.
- *
+/* Uses code from MoNav. Most code was originally taken from there,
+ * and changed to fit my purposes.
  */
+
 #include "pbfparser.hpp"
 
 
@@ -71,8 +72,6 @@ bool PBFParser::parse(QString filename)
     }
     m_loadBlock = true;
     
-    
-    //TODO: Parsen... im detail...
     OSMWay* inputWay = new OSMWay(0, QList<OSMProperty>());
     OSMNode* inputNode = new OSMNode(0, GPSPosition(), QList<OSMProperty>());
     Relation inputRelation;

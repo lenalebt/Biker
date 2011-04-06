@@ -16,6 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */ 
 
+/* Uses code from MoNav. Most code was originally taken from there,
+ * and changed to fit my purposes.
+ */
+
 #ifndef PBFPARSER_HPP
 #define PBFPARSER_HPP
 
