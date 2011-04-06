@@ -45,7 +45,7 @@ using namespace std;
     {
         //nötig, damit die flyweights nicht abstürzen
         boost::flyweight<QString>::init();
-        std::cout << "Warning: Pre-Alpha! Uses lots of RAM and might crash from time to time..." << std::endl;
+        std::cout << "Warning: Alpha! Uses lots of RAM and might crash from time to time..." << std::endl;
         
         QApplication app(argc, argv);
            
