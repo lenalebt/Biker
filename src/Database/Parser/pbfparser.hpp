@@ -122,14 +122,11 @@ private:
         std::vector< Tag > tags;
     };
     
-	void setNodeTags( QStringList tags );
-	void setWayTags( QStringList tags );
-	void setRelationTags( QStringList tags );
-	EntityType getEntitiy( Node* node, Way* way, Relation* relation );
-	void parseNode( Node* node );
+        EntityType getEntitiy( OSMNode* node, Way* way, Relation* relation );
+        void parseNode( OSMNode* node );
 	void parseWay( Way* way );
 	void parseRelation( Relation* relation );
-	void parseDense( Node* node );
+        void parseDense( OSMNode* node );
 	void loadGroup();
 	void loadBlock();
 	bool readNextBlock();
