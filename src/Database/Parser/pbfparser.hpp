@@ -16,6 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */ 
 
+/* Uses code from MoNav. Most code was originally taken from there,
+ * and changed to fit my purposes.
+ */
+
 #ifndef PBFPARSER_HPP
 #define PBFPARSER_HPP
 
@@ -122,14 +126,11 @@ private:
         std::vector< Tag > tags;
     };
     
-	void setNodeTags( QStringList tags );
-	void setWayTags( QStringList tags );
-	void setRelationTags( QStringList tags );
-	EntityType getEntitiy( Node* node, Way* way, Relation* relation );
-	void parseNode( Node* node );
-	void parseWay( Way* way );
+        EntityType getEntitiy( OSMNode* node, OSMWay* way, Relation* relation );
+        void parseNode( OSMNode* node );
+        void parseWay( OSMWay* way );
 	void parseRelation( Relation* relation );
-	void parseDense( Node* node );
+        void parseDense( OSMNode* node );
 	void loadGroup();
 	void loadBlock();
 	bool readNextBlock();

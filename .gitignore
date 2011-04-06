@@ -4,3 +4,9 @@ data/
 Biker.pro.user
 Makefile
 obj/
+
+
+src/Database/Parser/pbf/fileformat.pb.cc
+src/Database/Parser/pbf/fileformat.pb.h
+src/Database/Parser/pbf/osmformat.pb.cc
+src/Database/Parser/pbf/osmformat.pb.h

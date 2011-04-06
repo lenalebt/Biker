@@ -16,9 +16,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */ 
 
-/* Uses code from MoNav.
- *
+/* Uses code from MoNav. Most code was originally taken from there,
+ * and changed to fit my purposes.
  */
+
 #include "pbfparser.hpp"
 
 
@@ -71,46 +72,29 @@ bool PBFParser::parse(QString filename)
     }
     m_loadBlock = true;
     
-    
-    //TODO: Parsen... im detail...
-    Way inputWay;
-    Node inputNode;
+    OSMWay* inputWay = new OSMWay(0, QList<OSMProperty>());
+    OSMNode* inputNode = new OSMNode(0, GPSPosition(), QList<OSMProperty>());
     Relation inputRelation;
     while ( true )
     {
-        EntityType type = getEntitiy( &inputNode, &inputWay, &inputRelation );
+        EntityType type = getEntitiy( inputNode, inputWay, &inputRelation );
 
         if ( type == EntityNone )
             break;
 
         if ( type == EntityNode ) {
             this->nodeCount++;
-            OSMNode* node = new OSMNode(inputNode.id, inputNode.coordinate, QList<OSMProperty>());
-            
-            for (unsigned int i=0; i<inputNode.tags.size(); i++)
-            {
-                node->addProperty(OSMProperty(inputNode.tags[i].key, inputNode.tags[i].value));
-            }
-            
-            dbWriter.addNode(node);
+
+            dbWriter.addNode(inputNode);
+            inputNode = new OSMNode(0, GPSPosition(), QList<OSMProperty>());
 
             continue;
         }
 
         if ( type == EntityWay ) {
-            OSMWay* way = new OSMWay(inputWay.id, QList<OSMProperty>());
             
-            for (unsigned int i=0; i<inputWay.nodes.size(); i++)
-            {
-                way->addMember(inputWay.nodes[i]);
-            }
-            
-            for (unsigned int i=0; i<inputWay.tags.size(); i++)
-            {
-                way->addProperty(OSMProperty(inputWay.tags[i].key, inputWay.tags[i].value));
-            }
-            
-            dbWriter.addWay(way);
+            dbWriter.addWay(inputWay);
+            inputWay = new OSMWay(0, QList<OSMProperty>());
 
             continue;
         }
@@ -123,30 +107,7 @@ bool PBFParser::parse(QString filename)
 }
 
 
-
-void PBFParser::setNodeTags( QStringList tags )
-{
-    for ( int i = 0; i < tags.size(); i++ )
-        m_nodeTags.insert( tags[i], i );
-}
-
-
-void PBFParser::setWayTags( QStringList tags )
-{
-    for ( int i = 0; i < tags.size(); i++ )
-        m_wayTags.insert( tags[i], i );
-}
-
-
-void PBFParser::setRelationTags( QStringList tags )
-{
-    for ( int i = 0; i < tags.size(); i++ )
-        m_relationTags.insert( tags[i], i );
-}
-
-
-PBFParser::EntityType
-PBFParser::getEntitiy( Node* node, Way* way, Relation* relation )
+PBFParser::EntityType PBFParser::getEntitiy( OSMNode* node, OSMWay* way, Relation* relation )
 {
     if ( m_loadBlock ) {
         if ( !readNextBlock() )
@@ -180,19 +141,18 @@ int PBFParser::convertNetworkByteOrder( char data[4] )
 }
 
 
-void PBFParser::parseNode( Node* node )
+void PBFParser::parseNode( OSMNode* node )
 {
-    node->tags.clear();
-
     const OSMPBF::Node& inputNode = m_primitiveBlock.primitivegroup( m_currentGroup ).nodes( m_currentEntity );
-    node->id = inputNode.id();
-    node->coordinate.setLat(( ( double ) inputNode.lat() * m_primitiveBlock.granularity() + m_primitiveBlock.lat_offset() ) / NANO);
-    node->coordinate.setLon(( ( double ) inputNode.lon() * m_primitiveBlock.granularity() + m_primitiveBlock.lon_offset() ) / NANO);
+    node->setID(inputNode.id());
+    node->setLat(( ( double ) inputNode.lat() * m_primitiveBlock.granularity() + m_primitiveBlock.lat_offset() ) / NANO);
+    node->setLon(( ( double ) inputNode.lon() * m_primitiveBlock.granularity() + m_primitiveBlock.lon_offset() ) / NANO);
+    QList<OSMProperty> props;
     for ( int tag = 0; tag < inputNode.keys_size(); tag++ ) {
-        Tag newTag;
-        newTag.key = QString::fromUtf8( m_primitiveBlock.stringtable().s( inputNode.keys( tag ) ).data() );
-        newTag.value = QString::fromUtf8( m_primitiveBlock.stringtable().s( inputNode.vals( tag ) ).data() );
-        node->tags.push_back( newTag );
+        OSMProperty newTag;
+        newTag.setKey(QString::fromUtf8( m_primitiveBlock.stringtable().s( inputNode.keys( tag ) ).data() ));
+        newTag.setValue(QString::fromUtf8( m_primitiveBlock.stringtable().s( inputNode.vals( tag ) ).data() ));
+        node->addProperty(newTag);
     }
 
     m_currentEntity++;
@@ -207,24 +167,21 @@ void PBFParser::parseNode( Node* node )
 }
 
 
-void PBFParser::parseWay( Way* way )
+void PBFParser::parseWay( OSMWay* way )
 {
-    way->tags.clear();
-    way->nodes.clear();
-
     const OSMPBF::Way& inputWay = m_primitiveBlock.primitivegroup( m_currentGroup ).ways( m_currentEntity );
-    way->id = inputWay.id();
+    way->setID(inputWay.id());
     for ( int tag = 0; tag < inputWay.keys_size(); tag++ ) {
-        Tag newTag;
-        newTag.key = QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.keys( tag ) ).data() );
-        newTag.value = QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.vals( tag ) ).data() );
-        way->tags.push_back( newTag );
+        OSMProperty newTag;
+        newTag.setKey(QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.keys( tag ) ).data() ));
+        newTag.setValue(QString::fromUtf8( m_primitiveBlock.stringtable().s( inputWay.vals( tag ) ).data() ));
+        way->addProperty(newTag);
     }
 
     long long lastRef = 0;
     for ( int i = 0; i < inputWay.refs_size(); i++ ) {
         lastRef += inputWay.refs( i );
-        way->nodes.push_back( lastRef );
+        way->addMember(lastRef);
     }
 
     m_currentEntity++;
@@ -284,17 +241,15 @@ void PBFParser::parseRelation( Relation* relation )
 }
 
 
-void PBFParser::parseDense( Node* node )
+void PBFParser::parseDense( OSMNode* node )
 {
-    node->tags.clear();
-
     const OSMPBF::DenseNodes& dense = m_primitiveBlock.primitivegroup( m_currentGroup ).dense();
     m_lastDenseID += dense.id( m_currentEntity );
     m_lastDenseLatitude += dense.lat( m_currentEntity );
     m_lastDenseLongitude += dense.lon( m_currentEntity );
-    node->id = m_lastDenseID;
-    node->coordinate.setLat(( ( double ) m_lastDenseLatitude * m_primitiveBlock.granularity() + m_primitiveBlock.lat_offset() ) / NANO);
-    node->coordinate.setLon(( ( double ) m_lastDenseLongitude * m_primitiveBlock.granularity() + m_primitiveBlock.lon_offset() ) / NANO);
+    node->setID(m_lastDenseID);
+    node->setLat(( ( double ) m_lastDenseLatitude * m_primitiveBlock.granularity() + m_primitiveBlock.lat_offset() ) / NANO);
+    node->setLon(( ( double ) m_lastDenseLongitude * m_primitiveBlock.granularity() + m_primitiveBlock.lon_offset() ) / NANO);
 
     while ( true ){
         if ( m_lastDenseTag >= dense.keys_vals_size() )
@@ -306,10 +261,10 @@ void PBFParser::parseDense( Node* node )
             break;
         }
         
-        Tag newTag;
-        newTag.key = newTag.value = QString::fromUtf8( m_primitiveBlock.stringtable().s( dense.keys_vals( m_lastDenseTag ) ).data() );;
-        newTag.value = QString::fromUtf8( m_primitiveBlock.stringtable().s( dense.keys_vals( m_lastDenseTag + 1 ) ).data() );
-        node->tags.push_back( newTag );
+        OSMProperty newTag;
+        newTag.setKey(QString::fromUtf8( m_primitiveBlock.stringtable().s( dense.keys_vals( m_lastDenseTag ) ).data() ));
+        newTag.setValue(QString::fromUtf8( m_primitiveBlock.stringtable().s( dense.keys_vals( m_lastDenseTag + 1 ) ).data() ));
+        node->addProperty(newTag);
         m_lastDenseTag += 2;
     }
 
