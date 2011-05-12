@@ -1,11 +1,11 @@
 QT += xml \
     network
 INCLUDEPATH += /usr/include/ \
-    /usr/include/qwt5/
+    /usr/include/qwt-qt4/
 LIBS += -L/usr/lib \
     -lcurl \
     -lzzip \
-    -lqwt \
+    -lqwt-qt4 \
     -lprotobuf
 OBJECTS_DIR = obj
 MOC_DIR = obj

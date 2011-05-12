@@ -26,7 +26,10 @@
 #include <QHash>
 #include <QSet>
 #include "src/Routing/metric.hpp"
-
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QDebug>
 
 class RoutingNode : public OSMNode
 {
@@ -172,6 +175,177 @@ public:
             it.next().reset();
         }*/
         heap.clear();
+    }
+};
+
+/**
+ * Implementierung der Datenstruktur, die im Dijkstra benötigt wird,
+ * als Heap mit Feldern. In der Wurzel steht das minimale Element.
+ * Version mit Threads. Funktionen, deren Rückgabewerte ohne Berechnung feststehen,
+ * werden sofort beendet; evtl. nötige Berechnungen werden dann im Hintergrund durchgeführt.
+ */
+template<typename T>
+class ThreadedBinaryHeap : public Heap<T>, public QThread
+{
+private:
+    QList<boost::shared_ptr<T> > heap;
+    QHash<ID_Datatype, int> positionInHeap;	//nötig für decreaseKey
+    QMutex mutex;
+    QWaitCondition callAFunction;
+
+    enum FunctionToCall {
+        LET_SINK,
+        LET_ASCENT,
+        NOTHING,
+        EXIT_LOOP
+    };
+    FunctionToCall functionToCall;
+    int functionParameter;
+
+    void letSink(int i)
+    {
+        int j=2*i+1;
+        while (j<heap.size())	//"sinken lassen"
+        {
+                /* schau die Kinder von i an, welches ist kleiner?
+                 * j ist das linke Kind, j+1 ist das rechte Kind.*/
+                if ((j+1>=heap.size()) || (*(heap[j]) < *(heap[j+1])))
+                {	//linkes Kind ist kleiner
+                        boost::shared_ptr<T> tmpVal = heap[i];	//Tauschen
+                        heap[i] = heap[j];
+                        heap[j] = tmpVal;
+                        positionInHeap[heap[i]->getID()] = i;
+                        positionInHeap[heap[j]->getID()] = j;
+                        i=j;	//und weiter, zum linken Kind
+                }
+                else	//rechtes Kind ist kleiner
+                {
+                        boost::shared_ptr<T> tmpVal = heap[i];	//Tauschen
+                        heap[i] = heap[j+1];
+                        heap[j+1] = tmpVal;
+                        positionInHeap[heap[i]->getID()] = i;
+                        positionInHeap[heap[j+1]->getID()] = j+1;
+                        i=j+1;	//weiter, zum rechten Kind
+                }
+                j=2*i+1;
+        }
+    }
+    void letAscend(int i)
+    {
+        int j=(i-1)/2;
+        while (i != 0)	//steigen lassen...
+        {
+                /* Papa von i ansehen: Ist der kleiner? Wenn nein, tauschen.
+                 * Wenn ja, fertig.*/
+                if ((j>=heap.size()) || (*(heap[j]) < *(heap[i])))
+                {	//Papa Kind ist kleiner: fertig.
+                        break;
+                }
+                else	//Kind ist kleiner, tauschen!
+                {
+                        boost::shared_ptr<T> tmpVal = heap[i];	//Tauschen
+                        heap[i] = heap[j];
+                        heap[j] = tmpVal;
+                        positionInHeap[heap[i]->getID()] = i;
+                        positionInHeap[heap[j]->getID()] = j;
+                        i=j;	//weiter, zum Papa
+                }
+                j=(i-1)/2;
+        }
+    }
+public:
+    boost::shared_ptr<T> removeMinimumCostNode()
+    {
+        QMutexLocker locker(&mutex);
+        //Rückgabewert herausnehmen
+        boost::shared_ptr<T> retVal = heap[0];
+        heap[0] = heap.last();	//Wurzel durch letztes Element ersetzen
+        heap.removeLast();		//und dieses am Ende wegnehmen
+        positionInHeap.remove(retVal->getID());
+
+        if (!this->isEmpty())
+        {
+            positionInHeap[heap[0]->getID()] = 0;
+            //letSink(0);		//erstes Element sinken lassen
+            functionToCall = LET_SINK;
+            functionParameter = 0;
+            callAFunction.wakeAll();
+        }
+
+        return retVal;
+    }
+    void addNode(boost::shared_ptr<T> node)
+    {
+        QMutexLocker locker(&mutex);
+        heap << node;
+        positionInHeap[node->getID()] = heap.size()-1;
+        //letAscend(heap.size()-1);	//letztes Element aufsteigen lassen
+        functionToCall = LET_ASCENT;
+        functionParameter = heap.size()-1;
+        callAFunction.wakeAll();
+    }
+    void decreaseKey(boost::shared_ptr<T> node)
+    {
+        QMutexLocker locker(&mutex);
+        if (positionInHeap.contains(node->getID()))
+        {
+//	    int i = positionInHeap[node->getID()];
+            letAscend(positionInHeap[node->getID()]);
+            functionToCall = LET_ASCENT;
+            functionParameter = heap.size()-1;
+            callAFunction.wakeAll();
+        }
+        else
+        {
+                addNode(node);
+        }
+    }
+    bool isEmpty() {return heap.isEmpty();}
+    bool contains(ID_Datatype nodeID) {return positionInHeap.contains(nodeID);}
+    int size() {return positionInHeap.size();}
+    ThreadedBinaryHeap()
+    {
+        this->start();
+    }
+    ~ThreadedBinaryHeap()
+    {
+        /*for (QListIterator<boost::shared_ptr<T> > it(heap); it.hasNext(); )
+        {
+            it.next().reset();
+        }*/
+        mutex.lock();
+        functionToCall = EXIT_LOOP;
+        callAFunction.wakeAll();
+        mutex.unlock();
+        QThread::msleep(20);
+        heap.clear();
+    }
+    void run()
+    {
+        qDebug() << "Thread gestartet.";
+        mutex.lock();
+        bool runLoop = true;
+        while (runLoop)
+        {
+            callAFunction.wait(&mutex);
+
+            switch (functionToCall)
+            {
+                case LET_SINK:  letSink(functionParameter);
+                                break;
+                case LET_ASCENT:letAscend(functionParameter);
+                                break;
+                case EXIT_LOOP: runLoop = false;
+                                break;
+                case NOTHING:
+                default:        break;
+
+            }
+
+            functionToCall = NOTHING;
+            //mutex.unlock();
+            //mutex.lock();
+        }
     }
 };
 

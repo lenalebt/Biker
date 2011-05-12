@@ -355,23 +355,23 @@ GPSRoute MainWindow::calcRouteSection(GPSPosition start, GPSPosition end)
             bm->setPenalty_Cycleway_HighwaySecondary(ui->txtCycleway_HighwaySecondary->value() / 100.0);
             bm->setPenalty_Cycleway_HighwayTertiary(ui->txtCycleway_HighwayTertiary->value() / 100.0);
             
-            astar = new AStar(dbreader, bm, new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            astar = new AStar(dbreader, bm, new ThreadedBinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         else if (ui->cmbRoutingMetric->currentIndex() == 1)
         {
-            astar = new AStar(dbreader, new EuclidianMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            astar = new AStar(dbreader, new EuclidianMetric(), new ThreadedBinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         else if (ui->cmbRoutingMetric->currentIndex() == 2)
         {
-            astar = new AStar(dbreader, new CarMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            astar = new AStar(dbreader, new CarMetric(), new ThreadedBinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         else if (ui->cmbRoutingMetric->currentIndex() == 3)
         {
-            astar = new AStar(dbreader, new FastRoutingMetric(), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            astar = new AStar(dbreader, new FastRoutingMetric(), new ThreadedBinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         else
         {
-            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->txtAltitudePenalty->value()), new BinaryHeap<AStarRoutingNode>(), new HashClosedList());
+            astar = new AStar(dbreader, new BikeMetric(dbreader, ui->txtAltitudePenalty->value()), new ThreadedBinaryHeap<AStarRoutingNode>(), new HashClosedList());
         }
         GPSRoute newRouteSection = astar->calcShortestRoute(start, end);
         delete astar;
